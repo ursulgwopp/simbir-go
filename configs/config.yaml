@@ -1,0 +1,8 @@
+port: "2024"
+
+db:
+  host: "localhost"
+  port: 5432
+  username: "postgres"
+  dbname: "simbir_go"
+  sslmode: "disable"
