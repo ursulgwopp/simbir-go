@@ -1,14 +1,20 @@
 package service
 
-import "github.com/ursulgwopp/simbir-go/internal/models"
+import (
+	"github.com/ursulgwopp/simbir-go/internal/models"
+)
 
 type Repository interface {
-	SignUp(req models.AuthRequest) (int, error)
-	SignIn(req models.AuthRequest) (models.TokenInfo, error)
+	SignUp(req models.AccountRequest) (int, error)
+	SignIn(req models.AccountRequest) (models.TokenInfo, error)
 	SignOut(token string) error
 
 	GetAccount(accountId int) (models.AccountResponse, error)
-	UpdateAccount(accountId int, req models.AccountResponse)
+	UpdateAccount(accountId int, req models.AccountRequest) error
+
+	CheckUsernameExists(username string) (bool, error)
+	CheckUsernameIsEqualToOld(accountId int, username string) (bool, error)
+	CheckTokenIsValid(token string) (bool, error)
 }
 
 type Service struct {

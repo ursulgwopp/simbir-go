@@ -18,6 +18,16 @@ import (
 	"github.com/ursulgwopp/simbir-go/internal/transport"
 )
 
+// @title SimbirGO
+// @version 1.0
+
+// @host localhost:2024
+// @BasePath /
+
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
+
 func main() {
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 
@@ -47,7 +57,7 @@ func main() {
 
 	srv := &server.Server{}
 	go func() {
-		if err := srv.Run(viper.GetString("accountMicroservicePort"), transport.InitRoutes()); err != nil && err != http.ErrServerClosed {
+		if err := srv.Run(viper.GetString("port"), transport.InitRoutes()); err != nil && err != http.ErrServerClosed {
 			logrus.Fatalf("error running http server: %s", err.Error())
 		}
 	}()

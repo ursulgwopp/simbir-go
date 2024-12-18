@@ -1,0 +1,192 @@
+basePath: /
+definitions:
+  models.AccountRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  models.Response:
+    properties:
+      message: {}
+    type: object
+host: localhost:2024
+info:
+  contact: {}
+  title: SimbirGO
+  version: "1.0"
+paths:
+  /api/Account/Me:
+    get:
+      consumes:
+      - application/json
+      description: Get Profile
+      operationId: me
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Me
+      tags:
+      - Account
+  /api/Account/SignIn:
+    post:
+      consumes:
+      - application/json
+      description: Sign In
+      operationId: sign-in
+      parameters:
+      - description: Sign In Info
+        in: body
+        name: Input
+        required: true
+        schema:
+          $ref: '#/definitions/models.AccountRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: SignIn
+      tags:
+      - Account
+  /api/Account/SignOut:
+    post:
+      consumes:
+      - application/json
+      description: Sign Out
+      operationId: sign-out
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: SignOut
+      tags:
+      - Account
+  /api/Account/SignUp:
+    post:
+      consumes:
+      - application/json
+      description: Sign Up
+      operationId: sign-up
+      parameters:
+      - description: Sign Up Info
+        in: body
+        name: Input
+        required: true
+        schema:
+          $ref: '#/definitions/models.AccountRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: SignUp
+      tags:
+      - Account
+  /api/Account/Update:
+    put:
+      consumes:
+      - application/json
+      description: Update Profile
+      operationId: update
+      parameters:
+      - description: Update Info
+        in: body
+        name: Input
+        required: true
+        schema:
+          $ref: '#/definitions/models.AccountRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Update
+      tags:
+      - Account
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
