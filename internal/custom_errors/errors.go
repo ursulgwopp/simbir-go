@@ -11,4 +11,5 @@ var (
 	ErrIdNotFound                = errors.New("id not found")
 	ErrEmptyAuthHeader           = errors.New("empty auth header")
 	ErrInvalidToken              = errors.New("invalid token")
+	ErrAccessDenied              = errors.New("access denied")
 )

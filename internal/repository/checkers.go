@@ -38,3 +38,15 @@ func (r *PostgresRepository) CheckTokenIsValid(token string) (bool, error) {
 
 	return !exists, nil
 }
+
+func (r *PostgresRepository) CheckAccountIdExists(accountId int) (bool, error) {
+	var exists bool
+	query := "SELECT EXISTS(SELECT 1 FROM accounts WHERE id = $1)"
+
+	err := r.db.QueryRow(query, accountId).Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+
+	return exists, nil
+}

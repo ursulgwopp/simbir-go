@@ -7,6 +7,28 @@ definitions:
       username:
         type: string
     type: object
+  models.AdminAccountRequest:
+    properties:
+      balance:
+        type: number
+      isAdmin:
+        type: boolean
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  models.AdminAccountResponse:
+    properties:
+      balance:
+        type: number
+      id:
+        type: integer
+      isAdmin:
+        type: boolean
+      username:
+        type: string
+    type: object
   models.Response:
     properties:
       message: {}
@@ -184,6 +206,197 @@ paths:
       summary: Update
       tags:
       - Account
+  /api/Admin/Account:
+    get:
+      consumes:
+      - application/json
+      description: List Accounts
+      operationId: list-accounts
+      parameters:
+      - description: From
+        in: query
+        name: from
+        required: true
+        type: integer
+      - description: Count
+        in: query
+        name: count
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.AdminAccountResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: ListAccounts
+      tags:
+      - Admin Account
+    post:
+      consumes:
+      - application/json
+      description: Create Account
+      operationId: create-account
+      parameters:
+      - description: Account Info
+        in: body
+        name: Input
+        required: true
+        schema:
+          $ref: '#/definitions/models.AdminAccountRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: CreateAccount
+      tags:
+      - Admin Account
+  /api/Admin/Account/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Account
+      operationId: delete-account
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: DeleteAccount
+      tags:
+      - Admin Account
+    get:
+      consumes:
+      - application/json
+      description: Get Account
+      operationId: get-account
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.AdminAccountResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: GetAccount
+      tags:
+      - Admin Account
+    put:
+      consumes:
+      - application/json
+      description: Update Account
+      operationId: update-account
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update Info
+        in: body
+        name: Input
+        required: true
+        schema:
+          $ref: '#/definitions/models.AdminAccountRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: UpdateAccount
+      tags:
+      - Admin Account
 securityDefinitions:
   ApiKeyAuth:
     in: header

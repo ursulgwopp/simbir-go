@@ -2,6 +2,7 @@ package transport
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/ursulgwopp/simbir-go/internal/custom_errors"
@@ -37,6 +38,36 @@ func (t *Transport) userIdentity(c *gin.Context) {
 	c.Set("is_admin", tokenInfo.IsAdmin)
 }
 
+func (t *Transport) adminIdentity(c *gin.Context) {
+	header := c.GetHeader("Authorization")
+	if header == "" {
+		models.NewErrorResponse(c, http.StatusBadRequest, custom_errors.ErrEmptyAuthHeader.Error())
+		return
+	}
+
+	valid, err := t.service.CheckTokenIsValid(header)
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	if !valid {
+		models.NewErrorResponse(c, http.StatusUnauthorized, custom_errors.ErrInvalidToken.Error())
+		return
+	}
+
+	tokenInfo, err := t.service.ParseToken(header)
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	if !tokenInfo.IsAdmin {
+		models.NewErrorResponse(c, http.StatusForbidden, custom_errors.ErrAccessDenied.Error())
+		return
+	}
+}
+
 func getAccountId(c *gin.Context) (int, error) {
 	id, ok := c.Get("account_id")
 	if !ok {
@@ -63,4 +94,13 @@ func getToken(c *gin.Context) (string, error) {
 	}
 
 	return token, nil
+}
+
+func parseId(c *gin.Context) (int, error) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return -1, err
+	}
+
+	return id, nil
 }

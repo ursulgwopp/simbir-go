@@ -18,6 +18,12 @@ type Service interface {
 	GetAccount(accountId int) (models.AccountResponse, error)
 	UpdateAccount(accountId int, req models.AccountRequest) error
 
+	AdminListAccounts(from int, count int) ([]models.AdminAccountResponse, error)
+	AdminGetAccount(accountId int) (models.AdminAccountResponse, error)
+	AdminCreateAccount(req models.AdminAccountRequest) (int, error)
+	AdminUpdateAccount(accountId int, req models.AdminAccountRequest) error
+	AdminDeleteAccount(accountId int) error
+
 	CheckTokenIsValid(token string) (bool, error)
 	ParseToken(token string) (models.TokenInfo, error)
 }
@@ -45,6 +51,18 @@ func (t *Transport) InitRoutes() *gin.Engine {
 
 			account.GET("/Me", t.userIdentity, t.me)
 			account.PUT("/Update", t.userIdentity, t.update)
+		}
+
+		admin := api.Group("/Admin")
+		{
+			account := admin.Group("/Account", t.adminIdentity)
+			{
+				account.GET("/", t.adminListAccounts)
+				account.GET("/:id", t.adminGetAccount)
+				account.POST("/", t.adminCreateAccount)
+				account.PUT("/:id", t.adminUpdateAccount)
+				account.DELETE("/:id", t.adminDeleteAccount)
+			}
 		}
 	}
 

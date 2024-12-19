@@ -22,3 +22,17 @@ type TokenClaims struct {
 	jwt.StandardClaims
 	TokenInfo
 }
+
+type AdminAccountRequest struct {
+	Username string  `json:"username"`
+	Password string  `json:"password"`
+	Balance  float64 `json:"balance"`
+	IsAdmin  bool    `json:"isAdmin"`
+}
+
+type AdminAccountResponse struct {
+	Id       int     `json:"id"`
+	Username string  `json:"username"`
+	Balance  float64 `json:"balance"`
+	IsAdmin  bool    `json:"isAdmin"`
+}
