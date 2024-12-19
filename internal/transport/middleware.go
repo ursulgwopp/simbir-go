@@ -82,6 +82,20 @@ func getAccountId(c *gin.Context) (int, error) {
 	return idInt, nil
 }
 
+func getIsAdmin(c *gin.Context) (bool, error) {
+	isAdmin, ok := c.Get("is_admin")
+	if !ok {
+		return false, custom_errors.ErrIdNotFound
+	}
+
+	isAdminBool, ok := isAdmin.(bool)
+	if !ok {
+		return false, custom_errors.ErrInvalidIdType
+	}
+
+	return isAdminBool, nil
+}
+
 func getToken(c *gin.Context) (string, error) {
 	token_, ok := c.Get("token")
 	if !ok {

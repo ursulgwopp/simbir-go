@@ -397,6 +397,42 @@ paths:
       summary: UpdateAccount
       tags:
       - Admin Account
+  /api/Payment/Hesoyam/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Deposit
+      operationId: hesoyam
+      parameters:
+      - description: Account ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Hesoyam
+      tags:
+      - Hesoyam
 securityDefinitions:
   ApiKeyAuth:
     in: header

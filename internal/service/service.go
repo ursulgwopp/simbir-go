@@ -18,6 +18,8 @@ type Repository interface {
 	AdminUpdateAccount(accountId int, req models.AdminAccountRequest) error
 	AdminDeleteAccount(accountId int) error
 
+	Hesoyam(accountId int) error
+
 	CheckUsernameExists(username string) (bool, error)
 	CheckUsernameIsEqualToOld(accountId int, username string) (bool, error)
 	CheckTokenIsValid(token string) (bool, error)

@@ -24,6 +24,8 @@ type Service interface {
 	AdminUpdateAccount(accountId int, req models.AdminAccountRequest) error
 	AdminDeleteAccount(accountId int) error
 
+	Hesoyam(accountId int, userId int, isAdmin bool) error
+
 	CheckTokenIsValid(token string) (bool, error)
 	ParseToken(token string) (models.TokenInfo, error)
 }
@@ -62,6 +64,14 @@ func (t *Transport) InitRoutes() *gin.Engine {
 				account.POST("/", t.adminCreateAccount)
 				account.PUT("/:id", t.adminUpdateAccount)
 				account.DELETE("/:id", t.adminDeleteAccount)
+			}
+		}
+
+		payment := api.Group("/Payment", t.userIdentity)
+		{
+			hesoyam := payment.Group("/Hesoyam")
+			{
+				hesoyam.POST("/:id", t.hesoyam)
 			}
 		}
 	}
