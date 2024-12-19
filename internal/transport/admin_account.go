@@ -98,7 +98,7 @@ func (t *Transport) adminGetAccount(c *gin.Context) {
 // @Failure default {object} models.Response
 func (t *Transport) adminCreateAccount(c *gin.Context) {
 	var req models.AdminAccountRequest
-	if err := c.BindJSON(req); err != nil {
+	if err := c.BindJSON(&req); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -139,7 +139,7 @@ func (t *Transport) adminUpdateAccount(c *gin.Context) {
 	}
 
 	var req models.AdminAccountRequest
-	if err := c.BindJSON(req); err != nil {
+	if err := c.BindJSON(&req); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -154,7 +154,7 @@ func (t *Transport) adminUpdateAccount(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, "account successfully updated")
+	c.JSON(http.StatusOK, models.Response{Message: "account successfully updated"})
 }
 
 // @Router /api/Admin/Account/{id} [delete]
@@ -177,6 +177,19 @@ func (t *Transport) adminDeleteAccount(c *gin.Context) {
 		return
 	}
 
+	// userId, err := getAccountId(c)
+	// if err != nil {
+	// 	models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+	// 	return
+	// }
+
+	// ////////////////////////////////////////////////////////////////////////////////////
+	// if accountId == userId {
+	// 	models.NewErrorResponse(c, http.StatusBadRequest, "can not delete admin account")
+	// 	return
+	// }
+	// ////////////////////////////////////////////////////////////////////////////////////
+
 	if err := t.service.AdminDeleteAccount(accountId); err != nil {
 		if errors.Is(err, custom_errors.ErrIdNotFound) {
 			models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
@@ -186,4 +199,6 @@ func (t *Transport) adminDeleteAccount(c *gin.Context) {
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
+
+	c.JSON(http.StatusOK, models.Response{Message: "account successfully deleted"})
 }

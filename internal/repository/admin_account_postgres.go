@@ -53,7 +53,7 @@ func (r *PostgresRepository) AdminGetAccount(accountId int) (models.AdminAccount
 
 func (r *PostgresRepository) AdminUpdateAccount(accountId int, req models.AdminAccountRequest) error {
 	query := `UPDATE accounts SET username = $1, hash_password = $2, balance = $3, is_admin = $4 WHERE id = $5`
-	_, err := r.db.Exec(query, req.Username, req.Password, req.Balance, req.IsAdmin)
+	_, err := r.db.Exec(query, req.Username, req.Password, req.Balance, req.IsAdmin, accountId)
 
 	return err
 }
