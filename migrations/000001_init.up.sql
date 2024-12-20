@@ -6,6 +6,21 @@ CREATE TABLE accounts (
     is_admin BOOLEAN DEFAULT FALSE
 );
 
+CREATE TABLE transports (
+    id SERIAL PRIMARY KEY,
+    owner_id INTEGER,
+    can_be_rented BOOLEAN,
+    transport_type TEXT,
+    model TEXT,
+    color TEXT,
+    identifier TEXT,
+    description TEXT DEFAULT '',
+    latitude DECIMAL,
+    longitude DECIMAL,
+    minute_price DECIMAL DEFAULT 0,
+    day_price DECIMAL DEFAULT 0
+);
+
 CREATE TABLE blacklist (
     token TEXT
 );

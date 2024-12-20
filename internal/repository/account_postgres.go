@@ -23,10 +23,6 @@ func (r *PostgresRepository) SignIn(req models.AccountRequest) (models.TokenInfo
 	if err := r.db.QueryRow(query, req.Username, req.Password).Scan(&id, &isAdmin); err != nil {
 		return models.TokenInfo{}, err
 	}
-	// row := r.db.QueryRow(query, req.Username, req.Password)
-	// if err := row.Scan(&id, &isAdmin); err != nil {
-	// 	return models.TokenInfo{}, err
-	// }
 
 	return models.TokenInfo{AccountId: id, IsAdmin: isAdmin}, nil
 }

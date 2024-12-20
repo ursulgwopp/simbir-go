@@ -26,6 +26,11 @@ type Service interface {
 
 	Hesoyam(accountId int, userId int, isAdmin bool) error
 
+	CreateTransport(ownerId int, req models.TransportRequest) (int, error)
+	GetTransport(transportId int) (models.TransportResponse, error)
+	UpdateTransport(userId int, transportId int, req models.TransportRequest) error
+	DeleteTransport(userId int, transportId int) error
+
 	CheckTokenIsValid(token string) (bool, error)
 	ParseToken(token string) (models.TokenInfo, error)
 }
@@ -55,6 +60,22 @@ func (t *Transport) InitRoutes() *gin.Engine {
 			account.PUT("/Update", t.userIdentity, t.update)
 		}
 
+		payment := api.Group("/Payment", t.userIdentity)
+		{
+			hesoyam := payment.Group("/Hesoyam")
+			{
+				hesoyam.POST("/:id", t.hesoyam)
+			}
+		}
+
+		transport := api.Group("/Transport")
+		{
+			transport.GET("/:id", t.getTransport)
+			transport.POST("/", t.userIdentity, t.createTransport)
+			transport.PUT("/:id", t.userIdentity, t.updateTransport)
+			transport.DELETE("/:id", t.userIdentity, t.deleteTransport)
+		}
+
 		admin := api.Group("/Admin")
 		{
 			account := admin.Group("/Account", t.adminIdentity)
@@ -64,14 +85,6 @@ func (t *Transport) InitRoutes() *gin.Engine {
 				account.POST("/", t.adminCreateAccount)
 				account.PUT("/:id", t.adminUpdateAccount)
 				account.DELETE("/:id", t.adminDeleteAccount)
-			}
-		}
-
-		payment := api.Group("/Payment", t.userIdentity)
-		{
-			hesoyam := payment.Group("/Hesoyam")
-			{
-				hesoyam.POST("/:id", t.hesoyam)
 			}
 		}
 	}

@@ -33,6 +33,54 @@ definitions:
     properties:
       message: {}
     type: object
+  models.TransportRequest:
+    properties:
+      canBeRented:
+        type: boolean
+      color:
+        type: string
+      dayPrice:
+        type: number
+      description:
+        type: string
+      identifier:
+        type: string
+      latitude:
+        type: number
+      longitude:
+        type: number
+      minutePrice:
+        type: number
+      model:
+        type: string
+      transportType:
+        type: string
+    type: object
+  models.TransportResponse:
+    properties:
+      canBeRented:
+        type: boolean
+      color:
+        type: string
+      dayPrice:
+        type: number
+      description:
+        type: string
+      id:
+        type: integer
+      identifier:
+        type: string
+      latitude:
+        type: number
+      longitude:
+        type: number
+      minutePrice:
+        type: number
+      model:
+        type: string
+      transportType:
+        type: string
+    type: object
 host: localhost:2024
 info:
   contact: {}
@@ -264,8 +312,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
             $ref: '#/definitions/models.Response'
         "400":
@@ -433,6 +481,153 @@ paths:
       summary: Hesoyam
       tags:
       - Hesoyam
+  /api/Transport:
+    post:
+      consumes:
+      - application/json
+      description: Create Transport
+      operationId: create-transport
+      parameters:
+      - description: Transport Info
+        in: body
+        name: Input
+        required: true
+        schema:
+          $ref: '#/definitions/models.TransportRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: CreateTransport
+      tags:
+      - Transport
+  /api/Transport/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Transport
+      operationId: delete-transport
+      parameters:
+      - description: Transport ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: DeleteTransport
+      tags:
+      - Transport
+    get:
+      consumes:
+      - application/json
+      description: Get Transport
+      operationId: get-transport
+      parameters:
+      - description: Transport ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TransportResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: GetTransport
+      tags:
+      - Transport
+    put:
+      consumes:
+      - application/json
+      description: Update Transport
+      operationId: update-transport
+      parameters:
+      - description: Transport ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Transport Info
+        in: body
+        name: Input
+        required: true
+        schema:
+          $ref: '#/definitions/models.TransportRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: UpdateTransport
+      tags:
+      - Transport
 securityDefinitions:
   ApiKeyAuth:
     in: header

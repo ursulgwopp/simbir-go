@@ -92,7 +92,7 @@ func (t *Transport) adminGetAccount(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param Input body models.AdminAccountRequest true "Account Info"
-// @Success 200 {object} models.Response
+// @Success 201 {object} models.Response
 // @Failure 400 {object} models.Response
 // @Failure 500 {object} models.Response
 // @Failure default {object} models.Response

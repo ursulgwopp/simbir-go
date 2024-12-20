@@ -20,10 +20,17 @@ type Repository interface {
 
 	Hesoyam(accountId int) error
 
+	CreateTransport(ownerId int, req models.TransportRequest) (int, error)
+	GetTransport(transportId int) (models.TransportResponse, error)
+	UpdateTransport(transportId int, req models.TransportRequest) error
+	DeleteTransport(transportId int) error
+
 	CheckUsernameExists(username string) (bool, error)
 	CheckUsernameIsEqualToOld(accountId int, username string) (bool, error)
 	CheckTokenIsValid(token string) (bool, error)
 	CheckAccountIdExists(accountId int) (bool, error)
+	CheckOwnerId(transportId int) (int, error)
+	CheckTransportIdExists(transportId int) (bool, error)
 }
 
 type Service struct {
