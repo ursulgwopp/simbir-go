@@ -10,23 +10,25 @@ import (
 	"github.com/ursulgwopp/simbir-go/internal/models"
 )
 
-// @Router /api/Admin/Account [get]
+// @Router /api/Admin/Transport [get]
 // @Security ApiKeyAuth
-// @Summary ListAccounts
-// @Tags Admin Account
-// @Description List Accounts
-// @ID list-accounts
+// @Summary ListTransports
+// @Tags Admin Transport
+// @Description List Transports
+// @ID list-transports
 // @Accept json
 // @Produce json
 // @Param from query int true "From"
 // @Param count query int true "Count"
-// @Success 200 {array} models.AdminAccountResponse
+// @Param transportType query string true "TransportType"
+// @Success 200 {array} models.AdminTransportResponse
 // @Failure 400 {object} models.Response
 // @Failure 500 {object} models.Response
 // @Failure default {object} models.Response
-func (t *Transport) adminListAccounts(c *gin.Context) {
+func (t *Transport) adminListTransports(c *gin.Context) {
 	from_ := c.Query("from")
 	count_ := c.Query("count")
+	transportType := c.Query("transportType")
 
 	from, err := strconv.Atoi(from_)
 	if err != nil {
@@ -40,7 +42,7 @@ func (t *Transport) adminListAccounts(c *gin.Context) {
 		return
 	}
 
-	accounts, err := t.service.AdminListAccounts(from, count)
+	transport, err := t.service.AdminListTransports(from, count, transportType)
 	if err != nil {
 		if errors.Is(err, custom_errors.ErrInvalidParams) {
 			models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
@@ -51,30 +53,30 @@ func (t *Transport) adminListAccounts(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, accounts)
+	c.JSON(http.StatusOK, transport)
 }
 
-// @Router /api/Admin/Account/{id} [get]
+// @Router /api/Admin/Transport/{id} [get]
 // @Security ApiKeyAuth
-// @Summary GetAccount
-// @Tags Admin Account
-// @Description Get Account
-// @ID get-account
+// @Summary GetTransport
+// @Tags Admin Transport
+// @Description Get Transport
+// @ID get-transport
 // @Accept json
 // @Produce json
-// @Param id path int true "Account ID"
-// @Success 200 {object} models.AdminAccountResponse
+// @Param id path int true "Transport ID"
+// @Success 200 {object} models.AdminTransportResponse
 // @Failure 400 {object} models.Response
 // @Failure 500 {object} models.Response
 // @Failure default {object} models.Response
-func (t *Transport) adminGetAccount(c *gin.Context) {
-	accountId, err := parseId(c)
+func (t *Transport) adminGetTransport(c *gin.Context) {
+	transportId, err := parseId(c)
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	account, err := t.service.AdminGetAccount(accountId)
+	transport, err := t.service.AdminGetTransport(transportId)
 	if err != nil {
 		if errors.Is(err, custom_errors.ErrIdNotFound) {
 			models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
@@ -85,36 +87,31 @@ func (t *Transport) adminGetAccount(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, account)
+	c.JSON(http.StatusOK, transport)
 }
 
-// @Router /api/Admin/Account [post]
+// @Router /api/Admin/Transport [post]
 // @Security ApiKeyAuth
-// @Summary CreateAccount
-// @Tags Admin Account
-// @Description Create Account
-// @ID create-account
+// @Summary CreateTransport
+// @Tags Admin Transport
+// @Description Create Transport
+// @ID create-Transport
 // @Accept json
 // @Produce json
-// @Param Input body models.AdminAccountRequest true "Account Info"
+// @Param Input body models.AdminTransportRequest true "Transport Info"
 // @Success 201 {object} models.Response
 // @Failure 400 {object} models.Response
 // @Failure 500 {object} models.Response
 // @Failure default {object} models.Response
-func (t *Transport) adminCreateAccount(c *gin.Context) {
-	var req models.AdminAccountRequest
+func (t *Transport) adminCreateTransport(c *gin.Context) {
+	var req models.AdminTransportRequest
 	if err := c.BindJSON(&req); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	id, err := t.service.AdminCreateAccount(req)
+	id, err := t.service.AdminCreateTransport(req)
 	if err != nil {
-		if errors.Is(err, custom_errors.ErrUsernameExists) {
-			models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
-			return
-		}
-
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -122,80 +119,34 @@ func (t *Transport) adminCreateAccount(c *gin.Context) {
 	c.JSON(http.StatusCreated, map[string]interface{}{"id": id})
 }
 
-// @Router /api/Admin/Account/{id} [put]
+// @Router /api/Admin/Transport/{id} [put]
 // @Security ApiKeyAuth
-// @Summary UpdateAccount
-// @Tags Admin Account
-// @Description Update Account
-// @ID update-account
+// @Summary UpdateTransport
+// @Tags Admin Transport
+// @Description Update Transport
+// @ID update-transport
 // @Accept json
 // @Produce json
-// @Param id path int true "Account ID"
-// @Param Input body models.AdminAccountRequest true "Update Info"
+// @Param id path int true "Transport ID"
+// @Param Input body models.AdminTransportRequest true "Update Info"
 // @Success 200 {object} models.Response
 // @Failure 400 {object} models.Response
 // @Failure 500 {object} models.Response
 // @Failure default {object} models.Response
-func (t *Transport) adminUpdateAccount(c *gin.Context) {
-	accountId, err := parseId(c)
+func (t *Transport) adminUpdateTransport(c *gin.Context) {
+	transportId, err := parseId(c)
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	var req models.AdminAccountRequest
+	var req models.AdminTransportRequest
 	if err := c.BindJSON(&req); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	if err := t.service.AdminUpdateAccount(accountId, req); err != nil {
-		if errors.Is(err, custom_errors.ErrIdNotFound) || errors.Is(err, custom_errors.ErrUsernameExists) {
-			models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	c.JSON(http.StatusOK, models.Response{Message: "account successfully updated"})
-}
-
-// @Router /api/Admin/Account/{id} [delete]
-// @Security ApiKeyAuth
-// @Summary DeleteAccount
-// @Tags Admin Account
-// @Description Delete Account
-// @ID delete-account
-// @Accept json
-// @Produce json
-// @Param id path int true "Account ID"
-// @Success 200 {object} models.Response
-// @Failure 400 {object} models.Response
-// @Failure 500 {object} models.Response
-// @Failure default {object} models.Response
-func (t *Transport) adminDeleteAccount(c *gin.Context) {
-	accountId, err := parseId(c)
-	if err != nil {
-		models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
-		return
-	}
-
-	// userId, err := getAccountId(c)
-	// if err != nil {
-	// 	models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
-	// 	return
-	// }
-
-	// ////////////////////////////////////////////////////////////////////////////////////
-	// if accountId == userId {
-	// 	models.NewErrorResponse(c, http.StatusBadRequest, "can not delete admin account")
-	// 	return
-	// }
-	// ////////////////////////////////////////////////////////////////////////////////////
-
-	if err := t.service.AdminDeleteAccount(accountId); err != nil {
+	if err := t.service.AdminUpdateTransport(transportId, req); err != nil {
 		if errors.Is(err, custom_errors.ErrIdNotFound) {
 			models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 			return
@@ -205,5 +156,38 @@ func (t *Transport) adminDeleteAccount(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, models.Response{Message: "account successfully deleted"})
+	c.JSON(http.StatusOK, models.Response{Message: "transport successfully updated"})
+}
+
+// @Router /api/Admin/Transport/{id} [delete]
+// @Security ApiKeyAuth
+// @Summary DeleteTransport
+// @Tags Admin Transport
+// @Description Delete Transport
+// @ID delete-transport
+// @Accept json
+// @Produce json
+// @Param id path int true "Transport ID"
+// @Success 200 {object} models.Response
+// @Failure 400 {object} models.Response
+// @Failure 500 {object} models.Response
+// @Failure default {object} models.Response
+func (t *Transport) adminDeleteTransport(c *gin.Context) {
+	transportId, err := parseId(c)
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err := t.service.AdminDeleteTransport(transportId); err != nil {
+		if errors.Is(err, custom_errors.ErrIdNotFound) {
+			models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, models.Response{Message: "transport successfully deleted"})
 }

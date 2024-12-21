@@ -31,6 +31,12 @@ type Service interface {
 	UpdateTransport(userId int, transportId int, req models.TransportRequest) error
 	DeleteTransport(userId int, transportId int) error
 
+	AdminListTransports(from int, count int, transportType string) ([]models.AdminTransportResponse, error)
+	AdminGetTransport(transportId int) (models.AdminTransportResponse, error)
+	AdminCreateTransport(req models.AdminTransportRequest) (int, error)
+	AdminUpdateTransport(transportId int, req models.AdminTransportRequest) error
+	AdminDeleteTransport(transportId int) error
+
 	CheckTokenIsValid(token string) (bool, error)
 	ParseToken(token string) (models.TokenInfo, error)
 }
@@ -85,6 +91,15 @@ func (t *Transport) InitRoutes() *gin.Engine {
 				account.POST("/", t.adminCreateAccount)
 				account.PUT("/:id", t.adminUpdateAccount)
 				account.DELETE("/:id", t.adminDeleteAccount)
+			}
+
+			transport := admin.Group("/Transport", t.adminIdentity)
+			{
+				transport.GET("/", t.adminListTransports)
+				transport.GET("/:id", t.adminGetTransport)
+				transport.POST("/", t.adminCreateTransport)
+				transport.PUT("/:id", t.adminUpdateTransport)
+				transport.DELETE("/:id", t.adminDeleteTransport)
 			}
 		}
 	}

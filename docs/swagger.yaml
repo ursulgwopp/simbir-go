@@ -29,6 +29,58 @@ definitions:
       username:
         type: string
     type: object
+  models.AdminTransportRequest:
+    properties:
+      canBeRented:
+        type: boolean
+      color:
+        type: string
+      dayPrice:
+        type: number
+      description:
+        type: string
+      identifier:
+        type: string
+      latitude:
+        type: number
+      longitude:
+        type: number
+      minutePrice:
+        type: number
+      model:
+        type: string
+      ownerId:
+        type: integer
+      transportType:
+        type: string
+    type: object
+  models.AdminTransportResponse:
+    properties:
+      canBeRented:
+        type: boolean
+      color:
+        type: string
+      dayPrice:
+        type: number
+      description:
+        type: string
+      id:
+        type: integer
+      identifier:
+        type: string
+      latitude:
+        type: number
+      longitude:
+        type: number
+      minutePrice:
+        type: number
+      model:
+        type: string
+      ownerId:
+        type: integer
+      transportType:
+        type: string
+    type: object
   models.Response:
     properties:
       message: {}
@@ -445,6 +497,202 @@ paths:
       summary: UpdateAccount
       tags:
       - Admin Account
+  /api/Admin/Transport:
+    get:
+      consumes:
+      - application/json
+      description: List Transports
+      operationId: list-transports
+      parameters:
+      - description: From
+        in: query
+        name: from
+        required: true
+        type: integer
+      - description: Count
+        in: query
+        name: count
+        required: true
+        type: integer
+      - description: TransportType
+        in: query
+        name: transportType
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.AdminTransportResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: ListTransports
+      tags:
+      - Admin Transport
+    post:
+      consumes:
+      - application/json
+      description: Create Transport
+      operationId: create-Transport
+      parameters:
+      - description: Transport Info
+        in: body
+        name: Input
+        required: true
+        schema:
+          $ref: '#/definitions/models.AdminTransportRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: CreateTransport
+      tags:
+      - Admin Transport
+  /api/Admin/Transport/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Transport
+      operationId: delete-transport
+      parameters:
+      - description: Transport ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: DeleteTransport
+      tags:
+      - Admin Transport
+    get:
+      consumes:
+      - application/json
+      description: Get Transport
+      operationId: get-transport
+      parameters:
+      - description: Transport ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.AdminTransportResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: GetTransport
+      tags:
+      - Admin Transport
+    put:
+      consumes:
+      - application/json
+      description: Update Transport
+      operationId: update-transport
+      parameters:
+      - description: Transport ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update Info
+        in: body
+        name: Input
+        required: true
+        schema:
+          $ref: '#/definitions/models.AdminTransportRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: UpdateTransport
+      tags:
+      - Admin Transport
   /api/Payment/Hesoyam/{id}:
     post:
       consumes:

@@ -21,6 +21,10 @@ func (s *Service) AdminCreateAccount(req models.AdminAccountRequest) (int, error
 }
 
 func (s *Service) AdminListAccounts(from int, count int) ([]models.AdminAccountResponse, error) {
+	if from < 0 || count < 0 {
+		return []models.AdminAccountResponse{}, custom_errors.ErrInvalidParams
+	}
+
 	return s.repo.AdminListAccounts(from, count)
 }
 

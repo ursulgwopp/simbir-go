@@ -25,6 +25,12 @@ type Repository interface {
 	UpdateTransport(transportId int, req models.TransportRequest) error
 	DeleteTransport(transportId int) error
 
+	AdminListTransports(from int, count int, transportType string) ([]models.AdminTransportResponse, error)
+	AdminGetTransport(transportId int) (models.AdminTransportResponse, error)
+	AdminCreateTransport(req models.AdminTransportRequest) (int, error)
+	AdminUpdateTransport(transportId int, req models.AdminTransportRequest) error
+	AdminDeleteTransport(transportId int) error
+
 	CheckUsernameExists(username string) (bool, error)
 	CheckUsernameIsEqualToOld(accountId int, username string) (bool, error)
 	CheckTokenIsValid(token string) (bool, error)

@@ -12,4 +12,5 @@ var (
 	ErrEmptyAuthHeader           = errors.New("empty auth header")
 	ErrInvalidToken              = errors.New("invalid token")
 	ErrAccessDenied              = errors.New("access denied")
+	ErrInvalidParams             = errors.New("invalid params")
 )
