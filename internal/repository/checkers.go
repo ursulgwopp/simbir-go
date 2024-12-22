@@ -69,3 +69,14 @@ func (r *PostgresRepository) CheckTransportIdExists(transportId int) (bool, erro
 
 	return exists, nil
 }
+
+func (r *PostgresRepository) CheckRentIdExists(rentId int) (bool, error) {
+	var exists bool
+
+	query := `SELECT EXISTS(SELECT 1 FROM rents WHERE id = $1)`
+	if err := r.db.QueryRow(query, rentId).Scan(&exists); err != nil {
+		return false, err
+	}
+
+	return exists, nil
+}

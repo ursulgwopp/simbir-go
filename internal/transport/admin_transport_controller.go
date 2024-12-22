@@ -61,7 +61,7 @@ func (t *Transport) adminListTransports(c *gin.Context) {
 // @Summary GetTransport
 // @Tags Admin Transport
 // @Description Get Transport
-// @ID get-transport
+// @ID admin-get-transport
 // @Accept json
 // @Produce json
 // @Param id path int true "Transport ID"
@@ -95,7 +95,7 @@ func (t *Transport) adminGetTransport(c *gin.Context) {
 // @Summary CreateTransport
 // @Tags Admin Transport
 // @Description Create Transport
-// @ID create-Transport
+// @ID create-transport
 // @Accept json
 // @Produce json
 // @Param Input body models.AdminTransportRequest true "Transport Info"
@@ -164,7 +164,7 @@ func (t *Transport) adminUpdateTransport(c *gin.Context) {
 // @Summary DeleteTransport
 // @Tags Admin Transport
 // @Description Delete Transport
-// @ID delete-transport
+// @ID admin-delete-transport
 // @Accept json
 // @Produce json
 // @Param id path int true "Transport ID"

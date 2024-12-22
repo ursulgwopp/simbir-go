@@ -1,6 +1,10 @@
 package models
 
-import "github.com/dgrijalva/jwt-go"
+import (
+	"time"
+
+	"github.com/dgrijalva/jwt-go"
+)
 
 type AccountRequest struct {
 	Username string `json:"username"`
@@ -91,4 +95,15 @@ type AdminTransportResponse struct {
 	Longitude     float64 `json:"longitude"`
 	MinutePrice   float64 `json:"minutePrice,omitempty"`
 	DayPrice      float64 `json:"dayPrice,omitempty"`
+}
+
+type RentResponse struct {
+	Id          int       `json:"id"`
+	TransportId int       `json:"transportId"`
+	UserId      int       `json:"userId"`
+	TimeStart   time.Time `json:"timeStart"`
+	TimeEnd     time.Time `json:"timeEnd,omitempty"`
+	PriceOfUnit float64   `json:"priceOfUnit"`
+	PriceType   string    `json:"priceType"`
+	FinalPrice  float64   `json:"finalPrice,omitempty"`
 }

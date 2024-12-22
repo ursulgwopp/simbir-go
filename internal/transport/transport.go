@@ -18,18 +18,23 @@ type Service interface {
 	GetAccount(accountId int) (models.AccountResponse, error)
 	UpdateAccount(accountId int, req models.AccountRequest) error
 
-	AdminListAccounts(from int, count int) ([]models.AdminAccountResponse, error)
-	AdminGetAccount(accountId int) (models.AdminAccountResponse, error)
-	AdminCreateAccount(req models.AdminAccountRequest) (int, error)
-	AdminUpdateAccount(accountId int, req models.AdminAccountRequest) error
-	AdminDeleteAccount(accountId int) error
-
 	Hesoyam(accountId int, userId int, isAdmin bool) error
 
 	CreateTransport(ownerId int, req models.TransportRequest) (int, error)
 	GetTransport(transportId int) (models.TransportResponse, error)
 	UpdateTransport(userId int, transportId int, req models.TransportRequest) error
 	DeleteTransport(userId int, transportId int) error
+
+	GetAvailableTransport(latitude float64, longitude float64, radius float64, transportType string) ([]models.TransportResponse, error)
+	GetRent(userId int, rentId int) (models.RentResponse, error)
+	GetUserHistory(accountId int) ([]models.RentResponse, error)
+	GetTransportHistory(userId int, transportId int) ([]models.RentResponse, error)
+
+	AdminListAccounts(from int, count int) ([]models.AdminAccountResponse, error)
+	AdminGetAccount(accountId int) (models.AdminAccountResponse, error)
+	AdminCreateAccount(req models.AdminAccountRequest) (int, error)
+	AdminUpdateAccount(accountId int, req models.AdminAccountRequest) error
+	AdminDeleteAccount(accountId int) error
 
 	AdminListTransports(from int, count int, transportType string) ([]models.AdminTransportResponse, error)
 	AdminGetTransport(transportId int) (models.AdminTransportResponse, error)
@@ -80,6 +85,14 @@ func (t *Transport) InitRoutes() *gin.Engine {
 			transport.POST("/", t.userIdentity, t.createTransport)
 			transport.PUT("/:id", t.userIdentity, t.updateTransport)
 			transport.DELETE("/:id", t.userIdentity, t.deleteTransport)
+		}
+
+		rent := api.Group("/Rent")
+		{
+			rent.GET("/Transport", t.getAvailableTransport)
+			rent.GET("/MyHistory", t.userIdentity, t.getUserHistory)
+			rent.GET("/TransportHistory/:id", t.userIdentity, t.getTransportHistory)
+			rent.GET("/:id", t.userIdentity, t.getRent)
 		}
 
 		admin := api.Group("/Admin")

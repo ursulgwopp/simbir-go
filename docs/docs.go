@@ -657,7 +657,7 @@ const docTemplate = `{
                     "Admin Transport"
                 ],
                 "summary": "CreateTransport",
-                "operationId": "create-Transport",
+                "operationId": "create-transport",
                 "parameters": [
                     {
                         "description": "Transport Info",
@@ -715,7 +715,7 @@ const docTemplate = `{
                     "Admin Transport"
                 ],
                 "summary": "GetTransport",
-                "operationId": "get-transport",
+                "operationId": "admin-get-transport",
                 "parameters": [
                     {
                         "type": "integer",
@@ -832,7 +832,7 @@ const docTemplate = `{
                     "Admin Transport"
                 ],
                 "summary": "DeleteTransport",
-                "operationId": "delete-transport",
+                "operationId": "admin-delete-transport",
                 "parameters": [
                     {
                         "type": "integer",
@@ -903,6 +903,246 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/Rent/MyHistory": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get My History",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Rent"
+                ],
+                "summary": "GetMyHistory",
+                "operationId": "get-my-history",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.RentResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/Rent/Transport": {
+            "get": {
+                "description": "Get Available Transport",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Rent"
+                ],
+                "summary": "GetAvailableTransport",
+                "operationId": "get-available-transport",
+                "parameters": [
+                    {
+                        "type": "number",
+                        "description": "Latitude",
+                        "name": "latitude",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "description": "Longitude",
+                        "name": "longitude",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "description": "Radius",
+                        "name": "radius",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "TransportType",
+                        "name": "transportType",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.AdminTransportResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/Rent/TransportHistory/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get Transport History",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Rent"
+                ],
+                "summary": "GetTransportHistory",
+                "operationId": "get-transport-history",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Transport ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.RentResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/Rent/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get Rent",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Rent"
+                ],
+                "summary": "GetRent",
+                "operationId": "get-rent",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Rent ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.RentResponse"
                         }
                     },
                     "400": {
@@ -1275,6 +1515,35 @@ const docTemplate = `{
                 },
                 "transportType": {
                     "type": "string"
+                }
+            }
+        },
+        "models.RentResponse": {
+            "type": "object",
+            "properties": {
+                "finalPrice": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "priceOfUnit": {
+                    "type": "number"
+                },
+                "priceType": {
+                    "type": "string"
+                },
+                "timeEnd": {
+                    "type": "string"
+                },
+                "timeStart": {
+                    "type": "string"
+                },
+                "transportId": {
+                    "type": "integer"
+                },
+                "userId": {
+                    "type": "integer"
                 }
             }
         },

@@ -1,5 +1,7 @@
 DROP TABLE blacklist;
 
--- DROP TABLE transports;
+DROP TABLE rents;
+
+DROP TABLE transports;
 
 DROP TABLE accounts;

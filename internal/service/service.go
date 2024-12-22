@@ -25,6 +25,13 @@ type Repository interface {
 	UpdateTransport(transportId int, req models.TransportRequest) error
 	DeleteTransport(transportId int) error
 
+	GetAvailableTransport(latitude float64, longitude float64, radius float64, transportType string) ([]models.TransportResponse, error)
+	GetRent(rentId int) (models.RentResponse, error)
+	GetUserHistory(accountId int) ([]models.RentResponse, error)
+	GetTransportHistory(transportId int) ([]models.RentResponse, error)
+	StartRent(transportId int, rentType string) (int, error)
+	StopRent(rentId int, latitude float64, longitude float64) error
+
 	AdminListTransports(from int, count int, transportType string) ([]models.AdminTransportResponse, error)
 	AdminGetTransport(transportId int) (models.AdminTransportResponse, error)
 	AdminCreateTransport(req models.AdminTransportRequest) (int, error)
@@ -37,6 +44,7 @@ type Repository interface {
 	CheckAccountIdExists(accountId int) (bool, error)
 	CheckOwnerId(transportId int) (int, error)
 	CheckTransportIdExists(transportId int) (bool, error)
+	CheckRentIdExists(rentId int) (bool, error)
 }
 
 type Service struct {

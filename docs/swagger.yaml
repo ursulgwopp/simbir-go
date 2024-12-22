@@ -81,6 +81,25 @@ definitions:
       transportType:
         type: string
     type: object
+  models.RentResponse:
+    properties:
+      finalPrice:
+        type: number
+      id:
+        type: integer
+      priceOfUnit:
+        type: number
+      priceType:
+        type: string
+      timeEnd:
+        type: string
+      timeStart:
+        type: string
+      transportId:
+        type: integer
+      userId:
+        type: integer
+    type: object
   models.Response:
     properties:
       message: {}
@@ -549,7 +568,7 @@ paths:
       consumes:
       - application/json
       description: Create Transport
-      operationId: create-Transport
+      operationId: create-transport
       parameters:
       - description: Transport Info
         in: body
@@ -586,7 +605,7 @@ paths:
       consumes:
       - application/json
       description: Delete Transport
-      operationId: delete-transport
+      operationId: admin-delete-transport
       parameters:
       - description: Transport ID
         in: path
@@ -621,7 +640,7 @@ paths:
       consumes:
       - application/json
       description: Get Transport
-      operationId: get-transport
+      operationId: admin-get-transport
       parameters:
       - description: Transport ID
         in: path
@@ -729,6 +748,163 @@ paths:
       summary: Hesoyam
       tags:
       - Hesoyam
+  /api/Rent/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get Rent
+      operationId: get-rent
+      parameters:
+      - description: Rent ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.RentResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: GetRent
+      tags:
+      - Rent
+  /api/Rent/MyHistory:
+    get:
+      consumes:
+      - application/json
+      description: Get My History
+      operationId: get-my-history
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.RentResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: GetMyHistory
+      tags:
+      - Rent
+  /api/Rent/Transport:
+    get:
+      consumes:
+      - application/json
+      description: Get Available Transport
+      operationId: get-available-transport
+      parameters:
+      - description: Latitude
+        in: query
+        name: latitude
+        required: true
+        type: number
+      - description: Longitude
+        in: query
+        name: longitude
+        required: true
+        type: number
+      - description: Radius
+        in: query
+        name: radius
+        required: true
+        type: number
+      - description: TransportType
+        in: query
+        name: transportType
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.AdminTransportResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: GetAvailableTransport
+      tags:
+      - Rent
+  /api/Rent/TransportHistory/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get Transport History
+      operationId: get-transport-history
+      parameters:
+      - description: Transport ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.RentResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: GetTransportHistory
+      tags:
+      - Rent
   /api/Transport:
     post:
       consumes:
