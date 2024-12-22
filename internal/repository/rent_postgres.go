@@ -156,7 +156,7 @@ func (r *PostgresRepository) StopRent(rentId int, latitude float64, longitude fl
 
 	// update final price
 	if rent.PriceType == "Days" {
-		days := float64(int(rent.TimeEnd.Sub(rent.TimeStart).Hours()))/24 + 1
+		days := float64(int(rent.TimeEnd.Sub(rent.TimeStart).Hours())/24) + 1
 		rent.FinalPrice = days * rent.PriceOfUnit
 	} else {
 		minutes := float64(int(rent.TimeEnd.Sub(rent.TimeStart).Minutes())) + 1
