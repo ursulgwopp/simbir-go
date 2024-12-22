@@ -165,3 +165,86 @@ func (t *Transport) getTransportHistory(c *gin.Context) {
 
 	c.JSON(http.StatusOK, rents)
 }
+
+// @Router /api/Rent/New/{id} [post]
+// @Security ApiKeyAuth
+// @Summary StartRent
+// @Tags Rent
+// @Description Start Rent
+// @ID start-rent
+// @Accept json
+// @Produce json
+// @Param id path int true "Transport ID"
+// @Param rentType query string true "Rent Type"
+// @Success 200 {object} models.Response
+// @Failure 400 {object} models.Response
+// @Failure 500 {object} models.Response
+// @Failure default {object} models.Response
+func (t *Transport) startRent(c *gin.Context) {
+	userId, err := getAccountId(c)
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	transportId, err := parseId(c)
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	rentType := c.Query("rentType")
+
+	id, err := t.service.StartRent(userId, transportId, rentType)
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusCreated, map[string]interface{}{"id": id})
+}
+
+// @Router /api/Rent/Stop/{id} [post]
+// @Security ApiKeyAuth
+// @Summary StopRent
+// @Tags Rent
+// @Description Stop Rent
+// @ID stop-rent
+// @Accept json
+// @Produce json
+// @Param id path int true "Rent ID"
+// @Param latitude query float64 true "Latitude"
+// @Param longitude query float64 true "Longitude"
+// @Success 200 {object} models.Response
+// @Failure 400 {object} models.Response
+// @Failure 500 {object} models.Response
+// @Failure default {object} models.Response
+func (t *Transport) stopRent(c *gin.Context) {
+	rentId, err := parseId(c)
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	latitude_ := c.Query("latitude")
+	longitude_ := c.Query("longitude")
+
+	latitude, err := strconv.ParseFloat(latitude_, 64)
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	longitude, err := strconv.ParseFloat(longitude_, 64)
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err := t.service.StopRent(rentId, latitude, longitude); err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, models.Response{Message: "rent successfully stopped"})
+}

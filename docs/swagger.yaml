@@ -816,6 +816,93 @@ paths:
       summary: GetMyHistory
       tags:
       - Rent
+  /api/Rent/New/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Start Rent
+      operationId: start-rent
+      parameters:
+      - description: Transport ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Rent Type
+        in: query
+        name: rentType
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: StartRent
+      tags:
+      - Rent
+  /api/Rent/Stop/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Stop Rent
+      operationId: stop-rent
+      parameters:
+      - description: Rent ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Latitude
+        in: query
+        name: latitude
+        required: true
+        type: number
+      - description: Longitude
+        in: query
+        name: longitude
+        required: true
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Response'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: StopRent
+      tags:
+      - Rent
   /api/Rent/Transport:
     get:
       consumes:

@@ -61,3 +61,11 @@ func (s *Service) GetTransportHistory(userId int, transportId int) ([]models.Ren
 func (s *Service) GetUserHistory(accountId int) ([]models.RentResponse, error) {
 	return s.repo.GetUserHistory(accountId)
 }
+
+func (s *Service) StartRent(userId int, transportId int, rentType string) (int, error) {
+	return s.repo.StartRent(userId, transportId, rentType)
+}
+
+func (s *Service) StopRent(rentId int, latitude float64, longitude float64) error {
+	return s.repo.StopRent(rentId, latitude, longitude)
+}

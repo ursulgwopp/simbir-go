@@ -29,6 +29,8 @@ type Service interface {
 	GetRent(userId int, rentId int) (models.RentResponse, error)
 	GetUserHistory(accountId int) ([]models.RentResponse, error)
 	GetTransportHistory(userId int, transportId int) ([]models.RentResponse, error)
+	StartRent(userId int, transportId int, rentType string) (int, error)
+	StopRent(rentId int, latitude float64, longitude float64) error
 
 	AdminListAccounts(from int, count int) ([]models.AdminAccountResponse, error)
 	AdminGetAccount(accountId int) (models.AdminAccountResponse, error)
@@ -93,6 +95,8 @@ func (t *Transport) InitRoutes() *gin.Engine {
 			rent.GET("/MyHistory", t.userIdentity, t.getUserHistory)
 			rent.GET("/TransportHistory/:id", t.userIdentity, t.getTransportHistory)
 			rent.GET("/:id", t.userIdentity, t.getRent)
+			rent.POST("/New/:id", t.userIdentity, t.startRent)
+			rent.POST("/Stop/:id", t.userIdentity, t.stopRent)
 		}
 
 		admin := api.Group("/Admin")

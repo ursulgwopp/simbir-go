@@ -29,7 +29,7 @@ type Repository interface {
 	GetRent(rentId int) (models.RentResponse, error)
 	GetUserHistory(accountId int) ([]models.RentResponse, error)
 	GetTransportHistory(transportId int) ([]models.RentResponse, error)
-	StartRent(transportId int, rentType string) (int, error)
+	StartRent(userId int, transportId int, rentType string) (int, error)
 	StopRent(rentId int, latitude float64, longitude float64) error
 
 	AdminListTransports(from int, count int, transportType string) ([]models.AdminTransportResponse, error)
