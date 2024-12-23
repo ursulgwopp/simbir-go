@@ -2,10 +2,13 @@ package repository
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/ursulgwopp/simbir-go/configs"
 )
+
+var operationTimeout = time.Second * 3
 
 type PostgresRepository struct {
 	db *sqlx.DB

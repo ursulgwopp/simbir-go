@@ -1,8 +1,13 @@
 package repository
 
+import "context"
+
 func (r *PostgresRepository) Hesoyam(accountId int) error {
-	query := `UPDATE accounts SET balance = balance + 250000 WHERE id = $1`
-	_, err := r.db.Exec(query, accountId)
+	ctx, cancel := context.WithTimeout(context.Background(), operationTimeout)
+	defer cancel()
+
+	query := `UPDATE accounts SET balance = balance + 100000 WHERE id = $1`
+	_, err := r.db.ExecContext(ctx, query, accountId)
 
 	return err
 }
