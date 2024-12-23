@@ -80,3 +80,36 @@ func (r *PostgresRepository) CheckRentIdExists(rentId int) (bool, error) {
 
 	return exists, nil
 }
+
+func (r *PostgresRepository) CheckRentIsActive(rentId int) (bool, error) {
+	var active bool
+
+	query := `SELECT is_active FROM rents WHERE id = $1`
+	if err := r.db.QueryRow(query, rentId).Scan(&active); err != nil {
+		return false, err
+	}
+
+	return active, nil
+}
+
+func (r *PostgresRepository) CheckTransportIsAvailable(transportId int) (bool, error) {
+	var available bool
+
+	query := `SELECT can_be_rented FROM transports WHERE id = $1`
+	if err := r.db.QueryRow(query, transportId).Scan(&available); err != nil {
+		return false, err
+	}
+
+	return available, nil
+}
+
+func (r *PostgresRepository) CheckRentOwnerId(rentId int) (int, error) {
+	var id int
+
+	query := `SELECT user_id FROM rents WHERE id = $1`
+	if err := r.db.QueryRow(query, rentId).Scan(&id); err != nil {
+		return -1, err
+	}
+
+	return id, nil
+}

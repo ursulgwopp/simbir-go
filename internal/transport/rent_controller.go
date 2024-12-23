@@ -220,6 +220,12 @@ func (t *Transport) startRent(c *gin.Context) {
 // @Failure 500 {object} models.Response
 // @Failure default {object} models.Response
 func (t *Transport) stopRent(c *gin.Context) {
+	userId, err := getAccountId(c)
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
 	rentId, err := parseId(c)
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
@@ -241,7 +247,7 @@ func (t *Transport) stopRent(c *gin.Context) {
 		return
 	}
 
-	if err := t.service.StopRent(rentId, latitude, longitude); err != nil {
+	if err := t.service.StopRent(userId, rentId, latitude, longitude); err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}

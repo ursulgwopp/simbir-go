@@ -13,4 +13,7 @@ var (
 	ErrInvalidToken              = errors.New("invalid token")
 	ErrAccessDenied              = errors.New("access denied")
 	ErrInvalidParams             = errors.New("invalid params")
+	ErrTransportNotAvailable     = errors.New("transport is not available")
+	ErrAlreadyStopped            = errors.New("rent has been already stopped")
+	ErrCanNotRent                = errors.New("can not rent your own transport")
 )

@@ -45,6 +45,9 @@ type Repository interface {
 	CheckOwnerId(transportId int) (int, error)
 	CheckTransportIdExists(transportId int) (bool, error)
 	CheckRentIdExists(rentId int) (bool, error)
+	CheckRentIsActive(rentId int) (bool, error)
+	CheckTransportIsAvailable(transportId int) (bool, error)
+	CheckRentOwnerId(rentId int) (int, error)
 }
 
 type Service struct {

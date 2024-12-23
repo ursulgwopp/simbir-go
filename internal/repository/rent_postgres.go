@@ -14,10 +14,10 @@ func (r *PostgresRepository) GetAvailableTransport(latitude float64, longitude f
 	var err error
 
 	if transportType == "All" {
-		query = `SELECT id, can_be_rented, transport_type, model, color, identifier, description, latitude, longitude, minute_price, day_price FROM transports ORDER BY id`
+		query = `SELECT id, can_be_rented, transport_type, model, color, identifier, description, latitude, longitude, minute_price, day_price FROM transports WHERE can_be_rented = true ORDER BY id`
 		rows, err = r.db.Query(query)
 	} else {
-		query = `SELECT id, can_be_rented, transport_type, model, color, identifier, description, latitude, longitude, minute_price, day_price FROM transports WHERE transport_type = $1 ORDER BY id`
+		query = `SELECT id, can_be_rented, transport_type, model, color, identifier, description, latitude, longitude, minute_price, day_price FROM transports WHERE transport_type = $1 AND can_be_rented = true ORDER BY id`
 		rows, err = r.db.Query(query, transportType)
 	}
 
@@ -49,8 +49,8 @@ func (r *PostgresRepository) GetRent(rentId int) (models.RentResponse, error) {
 	var rent models.RentResponse
 	rent.Id = rentId
 
-	query := `SELECT transport_id, user_id, time_start, time_end, price_of_unit, price_type, final_price FROM rents WHERE id = $1`
-	if err := r.db.QueryRow(query, rentId).Scan(&rent.TransportId, &rent.UserId, &rent.TimeStart, &rent.TimeEnd, &rent.PriceOfUnit, &rent.PriceType, &rent.FinalPrice); err != nil {
+	query := `SELECT transport_id, user_id, time_start, time_end, price_of_unit, price_type, final_price, is_active FROM rents WHERE id = $1`
+	if err := r.db.QueryRow(query, rentId).Scan(&rent.TransportId, &rent.UserId, &rent.TimeStart, &rent.TimeEnd, &rent.PriceOfUnit, &rent.PriceType, &rent.FinalPrice, &rent.IsActive); err != nil {
 		return models.RentResponse{}, err
 	}
 
@@ -58,7 +58,7 @@ func (r *PostgresRepository) GetRent(rentId int) (models.RentResponse, error) {
 }
 
 func (r *PostgresRepository) GetTransportHistory(transportId int) ([]models.RentResponse, error) {
-	query := `SELECT id, user_id, time_start, time_end, price_of_unit, price_type, final_price FROM rents WHERE transport_id = $1`
+	query := `SELECT id, user_id, time_start, time_end, price_of_unit, price_type, final_price, is_active FROM rents WHERE transport_id = $1`
 	rows, err := r.db.Query(query, transportId)
 	if err != nil {
 		return []models.RentResponse{}, err
@@ -69,7 +69,7 @@ func (r *PostgresRepository) GetTransportHistory(transportId int) ([]models.Rent
 	for rows.Next() {
 		var rent models.RentResponse
 		rent.TransportId = transportId
-		if err := rows.Scan(&rent.Id, &rent.UserId, &rent.TimeStart, &rent.TimeEnd, &rent.PriceOfUnit, &rent.PriceType, &rent.FinalPrice); err != nil {
+		if err := rows.Scan(&rent.Id, &rent.UserId, &rent.TimeStart, &rent.TimeEnd, &rent.PriceOfUnit, &rent.PriceType, &rent.FinalPrice, &rent.IsActive); err != nil {
 			return []models.RentResponse{}, err
 		}
 
@@ -84,7 +84,7 @@ func (r *PostgresRepository) GetTransportHistory(transportId int) ([]models.Rent
 }
 
 func (r *PostgresRepository) GetUserHistory(accountId int) ([]models.RentResponse, error) {
-	query := `SELECT id, transport_id, time_start, time_end, price_of_unit, price_type, final_price FROM rents WHERE user_id = $1`
+	query := `SELECT id, transport_id, time_start, time_end, price_of_unit, price_type, final_price, is_active FROM rents WHERE user_id = $1`
 	rows, err := r.db.Query(query, accountId)
 	if err != nil {
 		return []models.RentResponse{}, err
@@ -95,7 +95,7 @@ func (r *PostgresRepository) GetUserHistory(accountId int) ([]models.RentRespons
 	for rows.Next() {
 		var rent models.RentResponse
 		rent.UserId = accountId
-		if err := rows.Scan(&rent.Id, &rent.TransportId, &rent.TimeStart, &rent.TimeEnd, &rent.PriceOfUnit, &rent.PriceType, &rent.FinalPrice); err != nil {
+		if err := rows.Scan(&rent.Id, &rent.TransportId, &rent.TimeStart, &rent.TimeEnd, &rent.PriceOfUnit, &rent.PriceType, &rent.FinalPrice, &rent.IsActive); err != nil {
 			return []models.RentResponse{}, err
 		}
 
@@ -148,7 +148,7 @@ func (r *PostgresRepository) StopRent(rentId int, latitude float64, longitude fl
 	}
 
 	// update timeend
-	query = `UPDATE rents SET time_end = $1 WHERE id = $2`
+	query = `UPDATE rents SET time_end = $1, is_active = false WHERE id = $2`
 	_, err := r.db.Exec(query, rent.TimeEnd, rentId)
 	if err != nil {
 		return err

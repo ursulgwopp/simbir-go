@@ -29,7 +29,8 @@ CREATE TABLE rents (
     time_end TIMESTAMPTZ DEFAULT '1970-01-01 00:00:00',
     price_of_unit DECIMAL,
     price_type TEXT,
-    final_price DECIMAL DEFAULT 0
+    final_price DECIMAL DEFAULT 0,
+    is_active BOOLEAN DEFAULT TRUE
 );
 
 CREATE TABLE blacklist (

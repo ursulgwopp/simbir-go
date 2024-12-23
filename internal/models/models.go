@@ -106,4 +106,5 @@ type RentResponse struct {
 	PriceOfUnit float64   `json:"priceOfUnit"`
 	PriceType   string    `json:"priceType"`
 	FinalPrice  float64   `json:"finalPrice,omitempty"`
+	IsActive    bool      `json:"is_active"`
 }

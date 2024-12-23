@@ -30,7 +30,7 @@ type Service interface {
 	GetUserHistory(accountId int) ([]models.RentResponse, error)
 	GetTransportHistory(userId int, transportId int) ([]models.RentResponse, error)
 	StartRent(userId int, transportId int, rentType string) (int, error)
-	StopRent(rentId int, latitude float64, longitude float64) error
+	StopRent(userId int, rentId int, latitude float64, longitude float64) error
 
 	AdminListAccounts(from int, count int) ([]models.AdminAccountResponse, error)
 	AdminGetAccount(accountId int) (models.AdminAccountResponse, error)
