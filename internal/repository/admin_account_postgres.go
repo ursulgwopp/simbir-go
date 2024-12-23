@@ -1,6 +1,11 @@
 package repository
 
-import "github.com/ursulgwopp/simbir-go/internal/models"
+import (
+	"context"
+	"time"
+
+	"github.com/ursulgwopp/simbir-go/internal/models"
+)
 
 // AdminCreateAccount implements service.Repository.
 func (r *PostgresRepository) AdminCreateAccount(req models.AdminAccountRequest) (int, error) {
@@ -15,8 +20,11 @@ func (r *PostgresRepository) AdminCreateAccount(req models.AdminAccountRequest) 
 }
 
 func (r *PostgresRepository) AdminListAccounts(from int, count int) ([]models.AdminAccountResponse, error) {
+	context, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
 	query := `SELECT id, username, balance, is_admin FROM accounts ORDER BY id OFFSET $1 LIMIT $2`
-	rows, err := r.db.Query(query, from, count)
+	rows, err := r.db.QueryContext(context, query, from, count)
 	if err != nil {
 		return []models.AdminAccountResponse{}, err
 	}
