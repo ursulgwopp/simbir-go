@@ -17,49 +17,9 @@ func generatePasswordHash(password string) string {
 	return fmt.Sprintf("%x", hash.Sum([]byte(os.Getenv("SALT"))))
 }
 
-func validateAccountRequest(req models.AccountRequest) error {
-	if len(req.Username) < 3 || len(req.Username) > 30 {
-		return custom_errors.ErrInvalidParams
-	}
-
-	if matched, _ := regexp.MatchString(`^[a-zA-Z0-9_]+$`, req.Username); !matched {
-		return custom_errors.ErrInvalidParams
-	}
-
-	if len(req.Password) < 3 {
-		return custom_errors.ErrInvalidParams
-	}
-
-	return nil
-}
-
-func validateAdminAccountRequest(req models.AdminAccountRequest) error {
-	if len(req.Username) < 3 || len(req.Username) > 30 {
-		return custom_errors.ErrInvalidParams
-	}
-
-	if matched, _ := regexp.MatchString(`^[a-zA-Z0-9_]+$`, req.Username); !matched {
-		return custom_errors.ErrInvalidParams
-	}
-
-	if len(req.Password) < 3 {
-		return custom_errors.ErrInvalidParams
-	}
-
-	if req.Balance < 0 {
-		return custom_errors.ErrInvalidParams
-	}
-
-	return nil
-}
-
-func validateUsernameUniqueness(exists bool, err error) error {
-	if err != nil {
-		return err
-	}
-
-	if exists {
-		return custom_errors.ErrUsernameExists
+func validatePagination(from int, count int) error {
+	if from < 0 || count < 0 {
+		return custom_errors.ErrInvalidPaginationParams
 	}
 
 	return nil
@@ -71,32 +31,73 @@ func validateAccountId(exists bool, err error) error {
 	}
 
 	if !exists {
-		return custom_errors.ErrIdNotFound
+		return custom_errors.ErrAccountIdNotFound
 	}
 
 	return nil
 }
 
-func validateUpdatedUsername(equal bool, err1 error, exists bool, err2 error) error {
+func validateAccountRequest(req models.AccountRequest) error {
+	if len(req.Username) < 3 || len(req.Username) > 30 {
+		return custom_errors.ErrInvalidUsernameLength
+	}
+
+	if matched, _ := regexp.MatchString(`^[a-zA-Z0-9_]+$`, req.Username); !matched {
+		return custom_errors.ErrInvalidUsernameCharacters
+	}
+
+	if len(req.Password) < 3 || len(req.Password) > 30 {
+		return custom_errors.ErrInvalidPasswordLength
+	}
+
+	return nil
+}
+
+func validateAdminAccountRequest(req models.AdminAccountRequest) error {
+	if len(req.Username) < 3 || len(req.Username) > 30 {
+		return custom_errors.ErrInvalidUsernameLength
+	}
+
+	if matched, _ := regexp.MatchString(`^[a-zA-Z0-9_]+$`, req.Username); !matched {
+		return custom_errors.ErrInvalidUsernameCharacters
+	}
+
+	if len(req.Password) < 3 || len(req.Password) > 30 {
+		return custom_errors.ErrInvalidPasswordLength
+	}
+
+	if req.Balance < 0 {
+		return custom_errors.ErrInvalidBalanceValue
+	}
+
+	return nil
+}
+
+func validateUsernameUniqueness(exists bool, err error) error {
+	if err != nil {
+		return err
+	}
+
+	if exists {
+		return custom_errors.ErrUsernameIsNotUnique
+	}
+
+	return nil
+}
+
+func validateUpdatedUsernameUniqueness(equal bool, err1 error, exists bool, err2 error) error {
 	if err1 != nil {
 		return err1
 	}
+
 	if !equal {
 		if err2 != nil {
 			return err2
 		}
 
 		if exists {
-			return custom_errors.ErrUsernameExists
+			return custom_errors.ErrUsernameIsNotUnique
 		}
-	}
-
-	return nil
-}
-
-func validatePagination(from int, count int) error {
-	if from < 0 || count < 0 {
-		return custom_errors.ErrInvalidParams
 	}
 
 	return nil
@@ -108,7 +109,30 @@ func validateAccountDeletion(has bool, err error) error {
 	}
 
 	if has {
-		return custom_errors.ErrCanNotDelete
+		return custom_errors.ErrCanNotDeleteAccount
+	}
+
+	return nil
+}
+
+func validateTransportId(exists bool, err error) error {
+	if err != nil {
+		return err
+	}
+
+	if !exists {
+		return custom_errors.ErrTransportIdNotFound
+	}
+
+	return nil
+}
+
+func validateTransportOwner(userId int, ownerId int, err error) error {
+	if err != nil {
+		return err
+	}
+	if userId != ownerId {
+		return custom_errors.ErrAccessDenied
 	}
 
 	return nil
@@ -116,15 +140,43 @@ func validateAccountDeletion(has bool, err error) error {
 
 func validateTransportType(transportType string) error {
 	if transportType != "Car" && transportType != "Bike" && transportType != "Scooter" && transportType != "All" {
-		return custom_errors.ErrInvalidParams
+		return custom_errors.ErrInvalidTransportType
 	}
 
 	return nil
 }
 
-func validateTransportProperties(model string, color string, description string, identifier string) error {
-	if len(model) > 255 || len(color) > 255 || len(description) > 255 || len(identifier) > 255 {
-		return custom_errors.ErrInvalidParams
+func validateTransportRequest(req models.TransportRequest) error {
+	if len(req.Model) > 255 || len(req.Color) > 255 || len(req.Description) > 255 || len(req.Identifier) > 255 {
+		return custom_errors.ErrInvalidTransportProperties
+	}
+
+	if req.Latitude < 0 || req.Longitude < 0 || req.MinutePrice < 0 || req.DayPrice < 0 {
+		return custom_errors.ErrInvalidTransportProperties
+	}
+
+	return nil
+}
+
+func validateAdminTransportRequest(req models.AdminTransportRequest) error {
+	if len(req.Model) > 255 || len(req.Color) > 255 || len(req.Description) > 255 || len(req.Identifier) > 255 {
+		return custom_errors.ErrInvalidTransportProperties
+	}
+
+	if req.Latitude < 0 || req.Longitude < 0 || req.MinutePrice < 0 || req.DayPrice < 0 {
+		return custom_errors.ErrInvalidTransportProperties
+	}
+
+	return nil
+}
+
+func validateTransportDeletion(has bool, err error) error {
+	if err != nil {
+		return err
+	}
+
+	if has {
+		return custom_errors.ErrCanNotDeleteTransport
 	}
 
 	return nil

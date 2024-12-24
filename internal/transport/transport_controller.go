@@ -30,7 +30,7 @@ func (t *Transport) getTransport(c *gin.Context) {
 
 	transport, err := t.service.GetTransport(transportId)
 	if err != nil {
-		if errors.Is(err, custom_errors.ErrIdNotFound) {
+		if errors.Is(err, custom_errors.ErrTransportIdNotFound) {
 			models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -70,6 +70,13 @@ func (t *Transport) createTransport(c *gin.Context) {
 
 	id, err := t.service.CreateTransport(userId, req)
 	if err != nil {
+		if errors.Is(err, custom_errors.ErrAccountIdNotFound) ||
+			errors.Is(err, custom_errors.ErrInvalidTransportType) ||
+			errors.Is(err, custom_errors.ErrInvalidTransportProperties) {
+			models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+			return
+		}
+
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -111,7 +118,10 @@ func (t *Transport) updateTransport(c *gin.Context) {
 	}
 
 	if err := t.service.UpdateTransport(userId, transportId, req); err != nil {
-		if errors.Is(err, custom_errors.ErrAccessDenied) || errors.Is(err, custom_errors.ErrIdNotFound) {
+		if errors.Is(err, custom_errors.ErrAccountIdNotFound) ||
+			errors.Is(err, custom_errors.ErrTransportIdNotFound) ||
+			errors.Is(err, custom_errors.ErrAccessDenied) ||
+			errors.Is(err, custom_errors.ErrInvalidTransportProperties) {
 			models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -150,12 +160,15 @@ func (t *Transport) deleteTransport(c *gin.Context) {
 	}
 
 	if err := t.service.DeleteTransport(userId, transportId); err != nil {
-		if errors.Is(err, custom_errors.ErrAccessDenied) || errors.Is(err, custom_errors.ErrIdNotFound) {
+		if errors.Is(err, custom_errors.ErrAccountIdNotFound) ||
+			errors.Is(err, custom_errors.ErrTransportIdNotFound) ||
+			errors.Is(err, custom_errors.ErrAccessDenied) ||
+			errors.Is(err, custom_errors.ErrCanNotDeleteTransport) {
 			models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 

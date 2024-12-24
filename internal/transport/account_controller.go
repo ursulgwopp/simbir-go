@@ -30,7 +30,10 @@ func (t *Transport) signUp(c *gin.Context) {
 
 	id, err := t.service.SignUp(req)
 	if err != nil {
-		if errors.Is(err, custom_errors.ErrUsernameExists) || errors.Is(err, custom_errors.ErrInvalidParams) {
+		if errors.Is(err, custom_errors.ErrInvalidUsernameLength) ||
+			errors.Is(err, custom_errors.ErrInvalidUsernameCharacters) ||
+			errors.Is(err, custom_errors.ErrInvalidPasswordLength) ||
+			errors.Is(err, custom_errors.ErrUsernameIsNotUnique) {
 			models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -64,7 +67,7 @@ func (t *Transport) signIn(c *gin.Context) {
 	token, err := t.service.SignIn(req)
 	if err != nil {
 		if errors.Is(err, custom_errors.ErrInvalidUsernameOrPassword) {
-			models.NewErrorResponse(c, http.StatusBadRequest, custom_errors.ErrInvalidUsernameOrPassword.Error())
+			models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -123,6 +126,11 @@ func (t *Transport) me(c *gin.Context) {
 
 	account, err := t.service.GetAccount(accountId)
 	if err != nil {
+		if errors.Is(err, custom_errors.ErrAccountIdNotFound) {
+			models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+			return
+		}
+
 		models.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -157,7 +165,11 @@ func (t *Transport) update(c *gin.Context) {
 	}
 
 	if err := t.service.UpdateAccount(accountId, req); err != nil {
-		if errors.Is(err, custom_errors.ErrUsernameExists) || errors.Is(err, custom_errors.ErrInvalidParams) {
+		if errors.Is(err, custom_errors.ErrAccountIdNotFound) ||
+			errors.Is(err, custom_errors.ErrInvalidUsernameLength) ||
+			errors.Is(err, custom_errors.ErrInvalidUsernameCharacters) ||
+			errors.Is(err, custom_errors.ErrInvalidPasswordLength) ||
+			errors.Is(err, custom_errors.ErrUsernameIsNotUnique) {
 			models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 			return
 		}

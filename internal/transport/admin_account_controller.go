@@ -42,7 +42,7 @@ func (t *Transport) adminListAccounts(c *gin.Context) {
 
 	accounts, err := t.service.AdminListAccounts(from, count)
 	if err != nil {
-		if errors.Is(err, custom_errors.ErrInvalidParams) {
+		if errors.Is(err, custom_errors.ErrInvalidPaginationParams) {
 			models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -76,7 +76,7 @@ func (t *Transport) adminGetAccount(c *gin.Context) {
 
 	account, err := t.service.AdminGetAccount(accountId)
 	if err != nil {
-		if errors.Is(err, custom_errors.ErrIdNotFound) {
+		if errors.Is(err, custom_errors.ErrAccountIdNotFound) {
 			models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -110,7 +110,11 @@ func (t *Transport) adminCreateAccount(c *gin.Context) {
 
 	id, err := t.service.AdminCreateAccount(req)
 	if err != nil {
-		if errors.Is(err, custom_errors.ErrUsernameExists) {
+		if errors.Is(err, custom_errors.ErrInvalidUsernameLength) ||
+			errors.Is(err, custom_errors.ErrInvalidUsernameCharacters) ||
+			errors.Is(err, custom_errors.ErrInvalidPasswordLength) ||
+			errors.Is(err, custom_errors.ErrInvalidBalanceValue) ||
+			errors.Is(err, custom_errors.ErrUsernameIsNotUnique) {
 			models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -150,7 +154,11 @@ func (t *Transport) adminUpdateAccount(c *gin.Context) {
 	}
 
 	if err := t.service.AdminUpdateAccount(accountId, req); err != nil {
-		if errors.Is(err, custom_errors.ErrIdNotFound) || errors.Is(err, custom_errors.ErrUsernameExists) {
+		if errors.Is(err, custom_errors.ErrAccountIdNotFound) ||
+			errors.Is(err, custom_errors.ErrInvalidUsernameLength) ||
+			errors.Is(err, custom_errors.ErrInvalidUsernameCharacters) ||
+			errors.Is(err, custom_errors.ErrInvalidPasswordLength) ||
+			errors.Is(err, custom_errors.ErrUsernameIsNotUnique) {
 			models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -188,13 +196,16 @@ func (t *Transport) adminDeleteAccount(c *gin.Context) {
 		return
 	}
 
+	//////////////////////////////////////////////////////////////////////////////////////////
 	if accountId == userId {
 		models.NewErrorResponse(c, http.StatusBadRequest, "can not delete admin account")
 		return
 	}
+	//////////////////////////////////////////////////////////////////////////////////////////
 
 	if err := t.service.AdminDeleteAccount(accountId); err != nil {
-		if errors.Is(err, custom_errors.ErrIdNotFound) || errors.Is(err, custom_errors.ErrCanNotDelete) {
+		if errors.Is(err, custom_errors.ErrAccountIdNotFound) ||
+			errors.Is(err, custom_errors.ErrCanNotDeleteAccount) {
 			models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 			return
 		}

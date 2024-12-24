@@ -10,17 +10,14 @@ import (
 )
 
 func (s *Service) SignUp(req models.AccountRequest) (int, error) {
-	// VALIDATE ACCOUNT INFO
 	if err := validateAccountRequest(req); err != nil {
 		return -1, err
 	}
 
-	// CHECK IF USERNAME IS UNIQUE
 	if err := validateUsernameUniqueness(s.repo.CheckUsernameExists(req.Username)); err != nil {
 		return -1, err
 	}
 
-	// HASH PASSWORD
 	req.Password = generatePasswordHash(req.Password)
 
 	return s.repo.SignUp(req)
@@ -54,7 +51,6 @@ func (s *Service) SignOut(token string) error {
 }
 
 func (s *Service) GetAccount(accountId int) (models.AccountResponse, error) {
-	// CHECK IF ACCOUNT ID EXISTS
 	if err := validateAccountId(s.repo.CheckAccountIdExists(accountId)); err != nil {
 		return models.AccountResponse{}, err
 	}
@@ -63,25 +59,20 @@ func (s *Service) GetAccount(accountId int) (models.AccountResponse, error) {
 }
 
 func (s *Service) UpdateAccount(accountId int, req models.AccountRequest) error {
-	// CHECK IF ACCOUNT ID EXISTS
 	if err := validateAccountId(s.repo.CheckAccountIdExists(accountId)); err != nil {
 		return err
 	}
 
-	// VALIDATE ACCOUNT INFO
 	if err := validateAccountRequest(req); err != nil {
 		return err
 	}
 
-	// CHECK IF USERNAME IS EQUAL TO OLD
-	// IN CASE IT IS NOT - CHECK IF USERNAME IS UNIQUE
 	equal, err1 := s.repo.CheckUsernameIsEqualToOld(accountId, req.Username)
 	exists, err2 := s.repo.CheckUsernameExists(req.Username)
-	if err := validateUpdatedUsername(equal, err1, exists, err2); err != nil {
+	if err := validateUpdatedUsernameUniqueness(equal, err1, exists, err2); err != nil {
 		return err
 	}
 
-	// HASH PASSWORD
 	req.Password = generatePasswordHash(req.Password)
 
 	return s.repo.UpdateAccount(accountId, req)
