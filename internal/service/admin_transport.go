@@ -10,7 +10,6 @@ func (s *Service) AdminCreateTransport(req models.AdminTransportRequest) (int, e
 	if err != nil {
 		return -1, err
 	}
-
 	if !exists {
 		return -1, custom_errors.ErrIdNotFound
 	}
@@ -18,11 +17,9 @@ func (s *Service) AdminCreateTransport(req models.AdminTransportRequest) (int, e
 	if err := validateTransportType(req.TransportType); err != nil {
 		return -1, err
 	}
-
 	if err := validateTransportProperties(req.Model, req.Color, req.Description, req.Identifier); err != nil {
 		return -1, err
 	}
-
 	if req.Latitude < 0 || req.Longitude < 0 || req.MinutePrice < 0 || req.DayPrice < 0 {
 		return -1, custom_errors.ErrInvalidParams
 	}
@@ -35,7 +32,6 @@ func (s *Service) AdminDeleteTransport(transportId int) error {
 	if err != nil {
 		return err
 	}
-
 	if !exists {
 		return custom_errors.ErrIdNotFound
 	}
@@ -44,7 +40,6 @@ func (s *Service) AdminDeleteTransport(transportId int) error {
 	if err != nil {
 		return err
 	}
-
 	if has {
 		return custom_errors.ErrCanNotDelete
 	}
@@ -57,7 +52,6 @@ func (s *Service) AdminGetTransport(transportId int) (models.AdminTransportRespo
 	if err != nil {
 		return models.AdminTransportResponse{}, err
 	}
-
 	if !exists {
 		return models.AdminTransportResponse{}, custom_errors.ErrIdNotFound
 	}
@@ -81,7 +75,6 @@ func (s *Service) AdminUpdateTransport(transportId int, req models.AdminTranspor
 	if err != nil {
 		return err
 	}
-
 	if !exists {
 		return custom_errors.ErrIdNotFound
 	}
@@ -89,11 +82,9 @@ func (s *Service) AdminUpdateTransport(transportId int, req models.AdminTranspor
 	if err := validateTransportType(req.TransportType); err != nil {
 		return err
 	}
-
 	if err := validateTransportProperties(req.Model, req.Color, req.Description, req.Identifier); err != nil {
 		return err
 	}
-
 	if req.Latitude < 0 || req.Longitude < 0 || req.MinutePrice < 0 || req.DayPrice < 0 {
 		return custom_errors.ErrInvalidParams
 	}

@@ -9,11 +9,9 @@ func (s *Service) AdminCreateAccount(req models.AdminAccountRequest) (int, error
 	if err := validateUsername(req.Username); err != nil {
 		return -1, custom_errors.ErrInvalidParams
 	}
-
 	if err := validatePassword(req.Password); err != nil {
 		return -1, custom_errors.ErrInvalidParams
 	}
-
 	if req.Balance < 0 {
 		return -1, custom_errors.ErrInvalidParams
 	}
@@ -22,7 +20,6 @@ func (s *Service) AdminCreateAccount(req models.AdminAccountRequest) (int, error
 	if err != nil {
 		return -1, err
 	}
-
 	if exists {
 		return -1, custom_errors.ErrUsernameExists
 	}
@@ -45,7 +42,6 @@ func (s *Service) AdminGetAccount(accountId int) (models.AdminAccountResponse, e
 	if err != nil {
 		return models.AdminAccountResponse{}, err
 	}
-
 	if !exists {
 		return models.AdminAccountResponse{}, custom_errors.ErrIdNotFound
 	}
@@ -58,7 +54,6 @@ func (s *Service) AdminUpdateAccount(accountId int, req models.AdminAccountReque
 	if err != nil {
 		return err
 	}
-
 	if !exists {
 		return custom_errors.ErrIdNotFound
 	}
@@ -66,11 +61,9 @@ func (s *Service) AdminUpdateAccount(accountId int, req models.AdminAccountReque
 	if err := validateUsername(req.Username); err != nil {
 		return custom_errors.ErrInvalidParams
 	}
-
 	if err := validatePassword(req.Password); err != nil {
 		return custom_errors.ErrInvalidParams
 	}
-
 	if req.Balance < 0 {
 		return custom_errors.ErrInvalidParams
 	}
@@ -101,7 +94,6 @@ func (s *Service) AdminDeleteAccount(accountId int) error {
 	if err != nil {
 		return err
 	}
-
 	if has {
 		return custom_errors.ErrCanNotDelete
 	}
@@ -110,7 +102,6 @@ func (s *Service) AdminDeleteAccount(accountId int) error {
 	if err != nil {
 		return err
 	}
-
 	if !exists {
 		return custom_errors.ErrIdNotFound
 	}

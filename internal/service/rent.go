@@ -10,7 +10,7 @@ func (s *Service) GetAvailableTransport(latitude float64, longitude float64, rad
 		return []models.TransportResponse{}, custom_errors.ErrInvalidParams
 	}
 
-	if transportType != "All" && transportType != "Car" && transportType != "Bike" && transportType != "Scooter" {
+	if err := validateTransportType(transportType); err != nil {
 		return []models.TransportResponse{}, custom_errors.ErrInvalidParams
 	}
 
@@ -18,11 +18,18 @@ func (s *Service) GetAvailableTransport(latitude float64, longitude float64, rad
 }
 
 func (s *Service) GetRent(userId int, rentId int) (models.RentResponse, error) {
-	exists, err := s.repo.CheckRentIdExists(rentId)
+	exists, err := s.repo.CheckAccountIdExists(userId)
 	if err != nil {
 		return models.RentResponse{}, err
 	}
+	if !exists {
+		return models.RentResponse{}, custom_errors.ErrIdNotFound
+	}
 
+	exists, err = s.repo.CheckRentIdExists(rentId)
+	if err != nil {
+		return models.RentResponse{}, err
+	}
 	if !exists {
 		return models.RentResponse{}, custom_errors.ErrIdNotFound
 	}
@@ -36,7 +43,6 @@ func (s *Service) GetRent(userId int, rentId int) (models.RentResponse, error) {
 	if err != nil {
 		return models.RentResponse{}, err
 	}
-
 	if userId != ownerId && userId != rent.UserId {
 		return models.RentResponse{}, custom_errors.ErrAccessDenied
 	}
@@ -45,11 +51,18 @@ func (s *Service) GetRent(userId int, rentId int) (models.RentResponse, error) {
 }
 
 func (s *Service) GetTransportHistory(userId int, transportId int) ([]models.RentResponse, error) {
-	exists, err := s.repo.CheckTransportIdExists(transportId)
+	exists, err := s.repo.CheckAccountIdExists(userId)
 	if err != nil {
 		return []models.RentResponse{}, err
 	}
+	if !exists {
+		return []models.RentResponse{}, custom_errors.ErrIdNotFound
+	}
 
+	exists, err = s.repo.CheckTransportIdExists(transportId)
+	if err != nil {
+		return []models.RentResponse{}, err
+	}
 	if !exists {
 		return []models.RentResponse{}, custom_errors.ErrIdNotFound
 	}
@@ -58,7 +71,6 @@ func (s *Service) GetTransportHistory(userId int, transportId int) ([]models.Ren
 	if err != nil {
 		return []models.RentResponse{}, err
 	}
-
 	if userId != ownerId {
 		return []models.RentResponse{}, custom_errors.ErrAccessDenied
 	}
@@ -67,24 +79,38 @@ func (s *Service) GetTransportHistory(userId int, transportId int) ([]models.Ren
 }
 
 func (s *Service) GetUserHistory(accountId int) ([]models.RentResponse, error) {
+	exists, err := s.repo.CheckAccountIdExists(accountId)
+	if err != nil {
+		return []models.RentResponse{}, err
+	}
+	if !exists {
+		return []models.RentResponse{}, custom_errors.ErrIdNotFound
+	}
+
 	return s.repo.GetUserHistory(accountId)
 }
 
 func (s *Service) StartRent(userId int, transportId int, rentType string) (int, error) {
+	exists, err := s.repo.CheckAccountIdExists(userId)
+	if err != nil {
+		return -1, err
+	}
+	if !exists {
+		return -1, custom_errors.ErrIdNotFound
+	}
+
 	ownerId, err := s.repo.CheckOwnerId(transportId)
 	if err != nil {
 		return -1, err
 	}
-
 	if ownerId == userId {
 		return -1, custom_errors.ErrCanNotRent
 	}
 
-	exists, err := s.repo.CheckTransportIdExists(transportId)
+	exists, err = s.repo.CheckTransportIdExists(transportId)
 	if err != nil {
 		return -1, err
 	}
-
 	if !exists {
 		return -1, custom_errors.ErrIdNotFound
 	}
@@ -93,7 +119,6 @@ func (s *Service) StartRent(userId int, transportId int, rentType string) (int, 
 	if err != nil {
 		return -1, err
 	}
-
 	if !is_available {
 		return -1, custom_errors.ErrTransportNotAvailable
 	}
@@ -106,11 +131,18 @@ func (s *Service) StartRent(userId int, transportId int, rentType string) (int, 
 }
 
 func (s *Service) StopRent(userId int, rentId int, latitude float64, longitude float64) error {
+	exists, err := s.repo.CheckAccountIdExists(userId)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		return custom_errors.ErrIdNotFound
+	}
+
 	ownerId, err := s.repo.CheckRentOwnerId(rentId)
 	if err != nil {
 		return err
 	}
-
 	if ownerId != userId {
 		return custom_errors.ErrAccessDenied
 	}
@@ -119,11 +151,10 @@ func (s *Service) StopRent(userId int, rentId int, latitude float64, longitude f
 		return custom_errors.ErrInvalidParams
 	}
 
-	exists, err := s.repo.CheckRentIdExists(rentId)
+	exists, err = s.repo.CheckRentIdExists(rentId)
 	if err != nil {
 		return err
 	}
-
 	if !exists {
 		return custom_errors.ErrIdNotFound
 	}
@@ -132,7 +163,6 @@ func (s *Service) StopRent(userId int, rentId int, latitude float64, longitude f
 	if err != nil {
 		return err
 	}
-
 	if !is_active {
 		return custom_errors.ErrAlreadyStopped
 	}

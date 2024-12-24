@@ -7,7 +7,6 @@ func (s *Service) Hesoyam(accountId int, userId int, isAdmin bool) error {
 	if err != nil {
 		return err
 	}
-
 	if !exists {
 		return custom_errors.ErrIdNotFound
 	}
@@ -16,7 +15,6 @@ func (s *Service) Hesoyam(accountId int, userId int, isAdmin bool) error {
 	if err != nil {
 		return err
 	}
-
 	if !exists {
 		return custom_errors.ErrIdNotFound
 	}

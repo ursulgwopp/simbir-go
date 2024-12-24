@@ -13,7 +13,6 @@ func (s *Service) SignUp(req models.AccountRequest) (int, error) {
 	if err := validateUsername(req.Username); err != nil {
 		return -1, err
 	}
-
 	if err := validatePassword(req.Password); err != nil {
 		return -1, err
 	}
@@ -22,7 +21,6 @@ func (s *Service) SignUp(req models.AccountRequest) (int, error) {
 	if err != nil {
 		return -1, err
 	}
-
 	if exists {
 		return -1, custom_errors.ErrUsernameExists
 	}
@@ -64,7 +62,6 @@ func (s *Service) GetAccount(accountId int) (models.AccountResponse, error) {
 	if err != nil {
 		return models.AccountResponse{}, err
 	}
-
 	if !exists {
 		return models.AccountResponse{}, custom_errors.ErrIdNotFound
 	}
@@ -77,7 +74,6 @@ func (s *Service) UpdateAccount(accountId int, req models.AccountRequest) error 
 	if err != nil {
 		return err
 	}
-
 	if !exists {
 		return custom_errors.ErrIdNotFound
 	}
@@ -85,7 +81,6 @@ func (s *Service) UpdateAccount(accountId int, req models.AccountRequest) error 
 	if err := validateUsername(req.Username); err != nil {
 		return err
 	}
-
 	if err := validatePassword(req.Password); err != nil {
 		return err
 	}
