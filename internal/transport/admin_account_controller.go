@@ -12,10 +12,10 @@ import (
 
 // @Router /api/Admin/Account [get]
 // @Security ApiKeyAuth
-// @Summary ListAccounts
+// @Summary AdminListAccounts
 // @Tags Admin Account
 // @Description List Accounts
-// @ID list-accounts
+// @ID admin-list-accounts
 // @Accept json
 // @Produce json
 // @Param from query int true "From"
@@ -56,10 +56,10 @@ func (t *Transport) adminListAccounts(c *gin.Context) {
 
 // @Router /api/Admin/Account/{id} [get]
 // @Security ApiKeyAuth
-// @Summary GetAccount
+// @Summary AdminGetAccount
 // @Tags Admin Account
 // @Description Get Account
-// @ID get-account
+// @ID admin-get-account
 // @Accept json
 // @Produce json
 // @Param id path int true "Account ID"
@@ -90,10 +90,10 @@ func (t *Transport) adminGetAccount(c *gin.Context) {
 
 // @Router /api/Admin/Account [post]
 // @Security ApiKeyAuth
-// @Summary CreateAccount
+// @Summary AdminCreateAccount
 // @Tags Admin Account
 // @Description Create Account
-// @ID create-account
+// @ID admin-create-account
 // @Accept json
 // @Produce json
 // @Param Input body models.AdminAccountRequest true "Account Info"
@@ -124,10 +124,10 @@ func (t *Transport) adminCreateAccount(c *gin.Context) {
 
 // @Router /api/Admin/Account/{id} [put]
 // @Security ApiKeyAuth
-// @Summary UpdateAccount
+// @Summary AdminUpdateAccount
 // @Tags Admin Account
 // @Description Update Account
-// @ID update-account
+// @ID admin-update-account
 // @Accept json
 // @Produce json
 // @Param id path int true "Account ID"
@@ -164,10 +164,10 @@ func (t *Transport) adminUpdateAccount(c *gin.Context) {
 
 // @Router /api/Admin/Account/{id} [delete]
 // @Security ApiKeyAuth
-// @Summary DeleteAccount
+// @Summary AdminDeleteAccount
 // @Tags Admin Account
 // @Description Delete Account
-// @ID delete-account
+// @ID admin-delete-account
 // @Accept json
 // @Produce json
 // @Param id path int true "Account ID"
@@ -176,27 +176,25 @@ func (t *Transport) adminUpdateAccount(c *gin.Context) {
 // @Failure 500 {object} models.Response
 // @Failure default {object} models.Response
 func (t *Transport) adminDeleteAccount(c *gin.Context) {
+	userId, err := getAccountId(c)
+	if err != nil {
+		models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
 	accountId, err := parseId(c)
 	if err != nil {
 		models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	// userId, err := getAccountId(c)
-	// if err != nil {
-	// 	models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
-	// 	return
-	// }
-
-	// ////////////////////////////////////////////////////////////////////////////////////
-	// if accountId == userId {
-	// 	models.NewErrorResponse(c, http.StatusBadRequest, "can not delete admin account")
-	// 	return
-	// }
-	// ////////////////////////////////////////////////////////////////////////////////////
+	if accountId == userId {
+		models.NewErrorResponse(c, http.StatusBadRequest, "can not delete admin account")
+		return
+	}
 
 	if err := t.service.AdminDeleteAccount(accountId); err != nil {
-		if errors.Is(err, custom_errors.ErrIdNotFound) {
+		if errors.Is(err, custom_errors.ErrIdNotFound) || errors.Is(err, custom_errors.ErrCanNotDelete) {
 			models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 			return
 		}

@@ -48,6 +48,17 @@ func (r *PostgresRepository) CheckAccountIdExists(accountId int) (bool, error) {
 	return exists, nil
 }
 
+func (r *PostgresRepository) CheckAccountIdHasActiveRents(accountId int) (bool, error) {
+	var has bool
+
+	query := `SELECT EXISTS(SELECT 1 FROM rents WHERE user_id = $1 AND is_active = TRUE)`
+	if err := r.db.QueryRow(query, accountId).Scan(&has); err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
 func (r *PostgresRepository) CheckOwnerId(transportId int) (int, error) {
 	var id int
 
@@ -68,6 +79,17 @@ func (r *PostgresRepository) CheckTransportIdExists(transportId int) (bool, erro
 	}
 
 	return exists, nil
+}
+
+func (r *PostgresRepository) CheckTransportIdHasActiveRents(transportId int) (bool, error) {
+	var has bool
+
+	query := `SELECT EXISTS(SELECT 1 FROM rents WHERE transport_id = $1 AND is_active = TRUE)`
+	if err := r.db.QueryRow(query, transportId).Scan(&has); err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 func (r *PostgresRepository) CheckRentIdExists(rentId int) (bool, error) {

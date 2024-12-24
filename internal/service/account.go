@@ -10,6 +10,14 @@ import (
 )
 
 func (s *Service) SignUp(req models.AccountRequest) (int, error) {
+	if err := validateUsername(req.Username); err != nil {
+		return -1, err
+	}
+
+	if err := validatePassword(req.Password); err != nil {
+		return -1, err
+	}
+
 	exists, err := s.repo.CheckUsernameExists(req.Username)
 	if err != nil {
 		return -1, err
@@ -52,12 +60,36 @@ func (s *Service) SignOut(token string) error {
 }
 
 func (s *Service) GetAccount(accountId int) (models.AccountResponse, error) {
+	exists, err := s.repo.CheckAccountIdExists(accountId)
+	if err != nil {
+		return models.AccountResponse{}, err
+	}
+
+	if !exists {
+		return models.AccountResponse{}, custom_errors.ErrIdNotFound
+	}
+
 	return s.repo.GetAccount(accountId)
 }
 
 func (s *Service) UpdateAccount(accountId int, req models.AccountRequest) error {
-	// DONT LIKE THIS CODE ACTUALLY ////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////////////
+	exists, err := s.repo.CheckAccountIdExists(accountId)
+	if err != nil {
+		return err
+	}
+
+	if !exists {
+		return custom_errors.ErrIdNotFound
+	}
+
+	if err := validateUsername(req.Username); err != nil {
+		return err
+	}
+
+	if err := validatePassword(req.Password); err != nil {
+		return err
+	}
+
 	equal, err := s.repo.CheckUsernameIsEqualToOld(accountId, req.Username)
 	if err != nil {
 		return err
@@ -73,8 +105,6 @@ func (s *Service) UpdateAccount(accountId int, req models.AccountRequest) error 
 			return custom_errors.ErrUsernameExists
 		}
 	}
-	// DONT LIKE THIS CODE ACTUALLY ////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	req.Password = generatePasswordHash(req.Password)
 

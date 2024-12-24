@@ -66,6 +66,10 @@ func (t *Transport) adminIdentity(c *gin.Context) {
 		models.NewErrorResponse(c, http.StatusForbidden, custom_errors.ErrAccessDenied.Error())
 		return
 	}
+
+	c.Set("token", header)
+	c.Set("account_id", tokenInfo.AccountId)
+	c.Set("is_admin", tokenInfo.IsAdmin)
 }
 
 func getAccountId(c *gin.Context) (int, error) {

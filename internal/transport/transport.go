@@ -99,9 +99,9 @@ func (t *Transport) InitRoutes() *gin.Engine {
 			rent.POST("/Stop/:id", t.userIdentity, t.stopRent)
 		}
 
-		admin := api.Group("/Admin")
+		admin := api.Group("/Admin", t.adminIdentity)
 		{
-			account := admin.Group("/Account", t.adminIdentity)
+			account := admin.Group("/Account")
 			{
 				account.GET("/", t.adminListAccounts)
 				account.GET("/:id", t.adminGetAccount)
@@ -110,7 +110,7 @@ func (t *Transport) InitRoutes() *gin.Engine {
 				account.DELETE("/:id", t.adminDeleteAccount)
 			}
 
-			transport := admin.Group("/Transport", t.adminIdentity)
+			transport := admin.Group("/Transport")
 			{
 				transport.GET("/", t.adminListTransports)
 				transport.GET("/:id", t.adminGetTransport)

@@ -87,6 +87,8 @@ definitions:
         type: number
       id:
         type: integer
+      is_active:
+        type: boolean
       priceOfUnit:
         type: number
       priceType:
@@ -163,7 +165,7 @@ paths:
       consumes:
       - application/json
       description: Get Profile
-      operationId: me
+      operationId: get-profile
       produces:
       - application/json
       responses:
@@ -185,7 +187,7 @@ paths:
             $ref: '#/definitions/models.Response'
       security:
       - ApiKeyAuth: []
-      summary: Me
+      summary: GetProfile
       tags:
       - Account
   /api/Account/SignIn:
@@ -195,7 +197,7 @@ paths:
       description: Sign In
       operationId: sign-in
       parameters:
-      - description: Sign In Info
+      - description: SignIn Info
         in: body
         name: Input
         required: true
@@ -260,7 +262,7 @@ paths:
       description: Sign Up
       operationId: sign-up
       parameters:
-      - description: Sign Up Info
+      - description: SignUp Info
         in: body
         name: Input
         required: true
@@ -293,7 +295,7 @@ paths:
       consumes:
       - application/json
       description: Update Profile
-      operationId: update
+      operationId: update-profile
       parameters:
       - description: Update Info
         in: body
@@ -322,7 +324,7 @@ paths:
             $ref: '#/definitions/models.Response'
       security:
       - ApiKeyAuth: []
-      summary: Update
+      summary: UpdateProfile
       tags:
       - Account
   /api/Admin/Account:
@@ -330,7 +332,7 @@ paths:
       consumes:
       - application/json
       description: List Accounts
-      operationId: list-accounts
+      operationId: admin-list-accounts
       parameters:
       - description: From
         in: query
@@ -365,14 +367,14 @@ paths:
             $ref: '#/definitions/models.Response'
       security:
       - ApiKeyAuth: []
-      summary: ListAccounts
+      summary: AdminListAccounts
       tags:
       - Admin Account
     post:
       consumes:
       - application/json
       description: Create Account
-      operationId: create-account
+      operationId: admin-create-account
       parameters:
       - description: Account Info
         in: body
@@ -401,7 +403,7 @@ paths:
             $ref: '#/definitions/models.Response'
       security:
       - ApiKeyAuth: []
-      summary: CreateAccount
+      summary: AdminCreateAccount
       tags:
       - Admin Account
   /api/Admin/Account/{id}:
@@ -409,7 +411,7 @@ paths:
       consumes:
       - application/json
       description: Delete Account
-      operationId: delete-account
+      operationId: admin-delete-account
       parameters:
       - description: Account ID
         in: path
@@ -437,14 +439,14 @@ paths:
             $ref: '#/definitions/models.Response'
       security:
       - ApiKeyAuth: []
-      summary: DeleteAccount
+      summary: AdminDeleteAccount
       tags:
       - Admin Account
     get:
       consumes:
       - application/json
       description: Get Account
-      operationId: get-account
+      operationId: admin-get-account
       parameters:
       - description: Account ID
         in: path
@@ -472,14 +474,14 @@ paths:
             $ref: '#/definitions/models.Response'
       security:
       - ApiKeyAuth: []
-      summary: GetAccount
+      summary: AdminGetAccount
       tags:
       - Admin Account
     put:
       consumes:
       - application/json
       description: Update Account
-      operationId: update-account
+      operationId: admin-update-account
       parameters:
       - description: Account ID
         in: path
@@ -513,7 +515,7 @@ paths:
             $ref: '#/definitions/models.Response'
       security:
       - ApiKeyAuth: []
-      summary: UpdateAccount
+      summary: AdminUpdateAccount
       tags:
       - Admin Account
   /api/Admin/Transport:

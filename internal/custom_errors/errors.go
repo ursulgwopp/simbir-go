@@ -16,4 +16,5 @@ var (
 	ErrTransportNotAvailable     = errors.New("transport is not available")
 	ErrAlreadyStopped            = errors.New("rent has been already stopped")
 	ErrCanNotRent                = errors.New("can not rent your own transport")
+	ErrCanNotDelete              = errors.New("can not delete")
 )

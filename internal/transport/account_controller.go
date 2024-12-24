@@ -16,7 +16,7 @@ import (
 // @ID sign-up
 // @Accept json
 // @Produce json
-// @Param Input body models.AccountRequest true "Sign Up Info"
+// @Param Input body models.AccountRequest true "SignUp Info"
 // @Success 201 {object} models.Response
 // @Failure 400 {object} models.Response
 // @Failure 500 {object} models.Response
@@ -30,7 +30,7 @@ func (t *Transport) signUp(c *gin.Context) {
 
 	id, err := t.service.SignUp(req)
 	if err != nil {
-		if errors.Is(err, custom_errors.ErrUsernameExists) {
+		if errors.Is(err, custom_errors.ErrUsernameExists) || errors.Is(err, custom_errors.ErrInvalidParams) {
 			models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 			return
 		}
@@ -49,7 +49,7 @@ func (t *Transport) signUp(c *gin.Context) {
 // @ID sign-in
 // @Accept json
 // @Produce json
-// @Param Input body models.AccountRequest true "Sign In Info"
+// @Param Input body models.AccountRequest true "SignIn Info"
 // @Success 200 {object} models.Response
 // @Failure 400 {object} models.Response
 // @Failure 500 {object} models.Response
@@ -104,10 +104,10 @@ func (t *Transport) signOut(c *gin.Context) {
 
 // @Router /api/Account/Me [get]
 // @Security ApiKeyAuth
-// @Summary Me
+// @Summary GetProfile
 // @Tags Account
 // @Description Get Profile
-// @ID me
+// @ID get-profile
 // @Accept json
 // @Produce json
 // @Success 200 {object} models.Response
@@ -132,10 +132,10 @@ func (t *Transport) me(c *gin.Context) {
 
 // @Router /api/Account/Update [put]
 // @Security ApiKeyAuth
-// @Summary Update
+// @Summary UpdateProfile
 // @Tags Account
 // @Description Update Profile
-// @ID update
+// @ID update-profile
 // @Accept json
 // @Produce json
 // @Param Input body models.AccountRequest true "Update Info"
@@ -157,7 +157,7 @@ func (t *Transport) update(c *gin.Context) {
 	}
 
 	if err := t.service.UpdateAccount(accountId, req); err != nil {
-		if errors.Is(err, custom_errors.ErrUsernameExists) {
+		if errors.Is(err, custom_errors.ErrUsernameExists) || errors.Is(err, custom_errors.ErrInvalidParams) {
 			models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 			return
 		}

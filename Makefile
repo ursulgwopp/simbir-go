@@ -6,3 +6,6 @@ up:
 
 down:
 	@migrate -path ./migrations -database 'postgres://postgres:postgres@localhost:5432/simbir_go?sslmode=disable' down
+
+swagger:
+	@swag init -g cmd/main/main.go

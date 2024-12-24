@@ -32,8 +32,8 @@ const docTemplate = `{
                 "tags": [
                     "Account"
                 ],
-                "summary": "Me",
-                "operationId": "me",
+                "summary": "GetProfile",
+                "operationId": "get-profile",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -78,7 +78,7 @@ const docTemplate = `{
                 "operationId": "sign-in",
                 "parameters": [
                     {
-                        "description": "Sign In Info",
+                        "description": "SignIn Info",
                         "name": "Input",
                         "in": "body",
                         "required": true,
@@ -178,7 +178,7 @@ const docTemplate = `{
                 "operationId": "sign-up",
                 "parameters": [
                     {
-                        "description": "Sign Up Info",
+                        "description": "SignUp Info",
                         "name": "Input",
                         "in": "body",
                         "required": true,
@@ -232,8 +232,8 @@ const docTemplate = `{
                 "tags": [
                     "Account"
                 ],
-                "summary": "Update",
-                "operationId": "update",
+                "summary": "UpdateProfile",
+                "operationId": "update-profile",
                 "parameters": [
                     {
                         "description": "Update Info",
@@ -290,8 +290,8 @@ const docTemplate = `{
                 "tags": [
                     "Admin Account"
                 ],
-                "summary": "ListAccounts",
-                "operationId": "list-accounts",
+                "summary": "AdminListAccounts",
+                "operationId": "admin-list-accounts",
                 "parameters": [
                     {
                         "type": "integer",
@@ -354,8 +354,8 @@ const docTemplate = `{
                 "tags": [
                     "Admin Account"
                 ],
-                "summary": "CreateAccount",
-                "operationId": "create-account",
+                "summary": "AdminCreateAccount",
+                "operationId": "admin-create-account",
                 "parameters": [
                     {
                         "description": "Account Info",
@@ -412,8 +412,8 @@ const docTemplate = `{
                 "tags": [
                     "Admin Account"
                 ],
-                "summary": "GetAccount",
-                "operationId": "get-account",
+                "summary": "AdminGetAccount",
+                "operationId": "admin-get-account",
                 "parameters": [
                     {
                         "type": "integer",
@@ -466,8 +466,8 @@ const docTemplate = `{
                 "tags": [
                     "Admin Account"
                 ],
-                "summary": "UpdateAccount",
-                "operationId": "update-account",
+                "summary": "AdminUpdateAccount",
+                "operationId": "admin-update-account",
                 "parameters": [
                     {
                         "type": "integer",
@@ -529,8 +529,8 @@ const docTemplate = `{
                 "tags": [
                     "Admin Account"
                 ],
-                "summary": "DeleteAccount",
-                "operationId": "delete-account",
+                "summary": "AdminDeleteAccount",
+                "operationId": "admin-delete-account",
                 "parameters": [
                     {
                         "type": "integer",
@@ -1659,6 +1659,9 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                },
+                "is_active": {
+                    "type": "boolean"
                 },
                 "priceOfUnit": {
                     "type": "number"

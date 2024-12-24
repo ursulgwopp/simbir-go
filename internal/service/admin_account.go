@@ -6,6 +6,18 @@ import (
 )
 
 func (s *Service) AdminCreateAccount(req models.AdminAccountRequest) (int, error) {
+	if err := validateUsername(req.Username); err != nil {
+		return -1, custom_errors.ErrInvalidParams
+	}
+
+	if err := validatePassword(req.Password); err != nil {
+		return -1, custom_errors.ErrInvalidParams
+	}
+
+	if req.Balance < 0 {
+		return -1, custom_errors.ErrInvalidParams
+	}
+
 	exists, err := s.repo.CheckUsernameExists(req.Username)
 	if err != nil {
 		return -1, err
@@ -51,8 +63,18 @@ func (s *Service) AdminUpdateAccount(accountId int, req models.AdminAccountReque
 		return custom_errors.ErrIdNotFound
 	}
 
-	// DONT LIKE THIS CODE ACTUALLY ////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////////////
+	if err := validateUsername(req.Username); err != nil {
+		return custom_errors.ErrInvalidParams
+	}
+
+	if err := validatePassword(req.Password); err != nil {
+		return custom_errors.ErrInvalidParams
+	}
+
+	if req.Balance < 0 {
+		return custom_errors.ErrInvalidParams
+	}
+
 	equal, err := s.repo.CheckUsernameIsEqualToOld(accountId, req.Username)
 	if err != nil {
 		return err
@@ -68,8 +90,6 @@ func (s *Service) AdminUpdateAccount(accountId int, req models.AdminAccountReque
 			return custom_errors.ErrUsernameExists
 		}
 	}
-	// DONT LIKE THIS CODE ACTUALLY ////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	req.Password = generatePasswordHash(req.Password)
 
@@ -77,6 +97,15 @@ func (s *Service) AdminUpdateAccount(accountId int, req models.AdminAccountReque
 }
 
 func (s *Service) AdminDeleteAccount(accountId int) error {
+	has, err := s.repo.CheckAccountIdHasActiveRents(accountId)
+	if err != nil {
+		return err
+	}
+
+	if has {
+		return custom_errors.ErrCanNotDelete
+	}
+
 	exists, err := s.repo.CheckAccountIdExists(accountId)
 	if err != nil {
 		return err
