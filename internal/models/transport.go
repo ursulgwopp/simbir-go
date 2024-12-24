@@ -1,46 +1,5 @@
 package models
 
-import (
-	"time"
-
-	"github.com/dgrijalva/jwt-go"
-)
-
-type AccountRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
-type AccountResponse struct {
-	Id       int     `json:"id"`
-	Username string  `json:"username"`
-	Balance  float64 `json:"balance"`
-}
-
-type TokenInfo struct {
-	AccountId int  `json:"account_id"`
-	IsAdmin   bool `json:"is_admin"`
-}
-
-type TokenClaims struct {
-	jwt.StandardClaims
-	TokenInfo
-}
-
-type AdminAccountRequest struct {
-	Username string  `json:"username"`
-	Password string  `json:"password"`
-	Balance  float64 `json:"balance"`
-	IsAdmin  bool    `json:"isAdmin"`
-}
-
-type AdminAccountResponse struct {
-	Id       int     `json:"id"`
-	Username string  `json:"username"`
-	Balance  float64 `json:"balance"`
-	IsAdmin  bool    `json:"isAdmin"`
-}
-
 type TransportRequest struct {
 	CanBeRented   bool    `json:"canBeRented"`
 	TransportType string  `json:"transportType"`
@@ -95,16 +54,4 @@ type AdminTransportResponse struct {
 	Longitude     float64 `json:"longitude"`
 	MinutePrice   float64 `json:"minutePrice,omitempty"`
 	DayPrice      float64 `json:"dayPrice,omitempty"`
-}
-
-type RentResponse struct {
-	Id          int       `json:"id"`
-	TransportId int       `json:"transportId"`
-	UserId      int       `json:"userId"`
-	TimeStart   time.Time `json:"timeStart"`
-	TimeEnd     time.Time `json:"timeEnd,omitempty"`
-	PriceOfUnit float64   `json:"priceOfUnit"`
-	PriceType   string    `json:"priceType"`
-	FinalPrice  float64   `json:"finalPrice,omitempty"`
-	IsActive    bool      `json:"is_active"`
 }

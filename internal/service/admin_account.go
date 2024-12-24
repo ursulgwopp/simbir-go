@@ -6,31 +6,25 @@ import (
 )
 
 func (s *Service) AdminCreateAccount(req models.AdminAccountRequest) (int, error) {
-	if err := validateUsername(req.Username); err != nil {
-		return -1, custom_errors.ErrInvalidParams
-	}
-	if err := validatePassword(req.Password); err != nil {
-		return -1, custom_errors.ErrInvalidParams
-	}
-	if req.Balance < 0 {
-		return -1, custom_errors.ErrInvalidParams
-	}
-
-	exists, err := s.repo.CheckUsernameExists(req.Username)
-	if err != nil {
+	// VALIDATE ACCOUNT INFO
+	if err := validateAdminAccountRequest(req); err != nil {
 		return -1, err
 	}
-	if exists {
-		return -1, custom_errors.ErrUsernameExists
+
+	// CHECK IF USERNAME IS UNIQUE
+	if err := validateUsernameUniqueness(s.repo.CheckUsernameExists(req.Username)); err != nil {
+		return -1, err
 	}
 
+	// HASH PASSWORD
 	req.Password = generatePasswordHash(req.Password)
 
 	return s.repo.AdminCreateAccount(req)
 }
 
 func (s *Service) AdminListAccounts(from int, count int) ([]models.AdminAccountResponse, error) {
-	if from < 0 || count < 0 {
+	// VALIDATE INPUT PARAMS
+	if err := validatePagination(from, count); err != nil {
 		return []models.AdminAccountResponse{}, custom_errors.ErrInvalidParams
 	}
 
@@ -38,72 +32,49 @@ func (s *Service) AdminListAccounts(from int, count int) ([]models.AdminAccountR
 }
 
 func (s *Service) AdminGetAccount(accountId int) (models.AdminAccountResponse, error) {
-	exists, err := s.repo.CheckAccountIdExists(accountId)
-	if err != nil {
+	// CHECK IF ACCOUNT ID EXISTS
+	if err := validateAccountId(s.repo.CheckAccountIdExists(accountId)); err != nil {
 		return models.AdminAccountResponse{}, err
-	}
-	if !exists {
-		return models.AdminAccountResponse{}, custom_errors.ErrIdNotFound
 	}
 
 	return s.repo.AdminGetAccount(accountId)
 }
 
 func (s *Service) AdminUpdateAccount(accountId int, req models.AdminAccountRequest) error {
-	exists, err := s.repo.CheckAccountIdExists(accountId)
-	if err != nil {
-		return err
-	}
-	if !exists {
-		return custom_errors.ErrIdNotFound
-	}
-
-	if err := validateUsername(req.Username); err != nil {
-		return custom_errors.ErrInvalidParams
-	}
-	if err := validatePassword(req.Password); err != nil {
-		return custom_errors.ErrInvalidParams
-	}
-	if req.Balance < 0 {
-		return custom_errors.ErrInvalidParams
-	}
-
-	equal, err := s.repo.CheckUsernameIsEqualToOld(accountId, req.Username)
-	if err != nil {
+	// CHECK IF ACCOUNT ID EXISTS
+	if err := validateAccountId(s.repo.CheckAccountIdExists(accountId)); err != nil {
 		return err
 	}
 
-	if !equal {
-		exists, err := s.repo.CheckUsernameExists(req.Username)
-		if err != nil {
-			return err
-		}
-
-		if exists {
-			return custom_errors.ErrUsernameExists
-		}
+	// VALIDATE ACCOUNT INFO
+	if err := validateAdminAccountRequest(req); err != nil {
+		return err
 	}
 
+	// CHECK IF USERNAME IS EQUAL TO OLD
+	// IN CASE IT IS NOT - CHECK IF USERNAME IS UNIQUE
+	equal, err1 := s.repo.CheckUsernameIsEqualToOld(accountId, req.Username)
+	exists, err2 := s.repo.CheckUsernameExists(req.Username)
+	if err := validateUpdatedUsername(equal, err1, exists, err2); err != nil {
+		return err
+	}
+
+	// HASH PASSWORD
 	req.Password = generatePasswordHash(req.Password)
 
 	return s.repo.AdminUpdateAccount(accountId, req)
 }
 
 func (s *Service) AdminDeleteAccount(accountId int) error {
-	has, err := s.repo.CheckAccountIdHasActiveRents(accountId)
-	if err != nil {
+	// CHECK IF ACCOUNT ID EXISTS
+	if err := validateAccountId(s.repo.CheckAccountIdExists(accountId)); err != nil {
 		return err
-	}
-	if has {
-		return custom_errors.ErrCanNotDelete
 	}
 
-	exists, err := s.repo.CheckAccountIdExists(accountId)
-	if err != nil {
+	// CHECK IF ACCOUNT ID HAS ANY ACTIVE RENTS
+	// IF SO - CAN NOT DELETE ACCOUNT
+	if err := validateAccountDeletion(s.repo.CheckAccountIdHasActiveRents(accountId)); err != nil {
 		return err
-	}
-	if !exists {
-		return custom_errors.ErrIdNotFound
 	}
 
 	return s.repo.AdminDeleteAccount(accountId)

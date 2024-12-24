@@ -10,21 +10,17 @@ import (
 )
 
 func (s *Service) SignUp(req models.AccountRequest) (int, error) {
-	if err := validateUsername(req.Username); err != nil {
-		return -1, err
-	}
-	if err := validatePassword(req.Password); err != nil {
+	// VALIDATE ACCOUNT INFO
+	if err := validateAccountRequest(req); err != nil {
 		return -1, err
 	}
 
-	exists, err := s.repo.CheckUsernameExists(req.Username)
-	if err != nil {
+	// CHECK IF USERNAME IS UNIQUE
+	if err := validateUsernameUniqueness(s.repo.CheckUsernameExists(req.Username)); err != nil {
 		return -1, err
 	}
-	if exists {
-		return -1, custom_errors.ErrUsernameExists
-	}
 
+	// HASH PASSWORD
 	req.Password = generatePasswordHash(req.Password)
 
 	return s.repo.SignUp(req)
@@ -58,49 +54,34 @@ func (s *Service) SignOut(token string) error {
 }
 
 func (s *Service) GetAccount(accountId int) (models.AccountResponse, error) {
-	exists, err := s.repo.CheckAccountIdExists(accountId)
-	if err != nil {
+	// CHECK IF ACCOUNT ID EXISTS
+	if err := validateAccountId(s.repo.CheckAccountIdExists(accountId)); err != nil {
 		return models.AccountResponse{}, err
-	}
-	if !exists {
-		return models.AccountResponse{}, custom_errors.ErrIdNotFound
 	}
 
 	return s.repo.GetAccount(accountId)
 }
 
 func (s *Service) UpdateAccount(accountId int, req models.AccountRequest) error {
-	exists, err := s.repo.CheckAccountIdExists(accountId)
-	if err != nil {
-		return err
-	}
-	if !exists {
-		return custom_errors.ErrIdNotFound
-	}
-
-	if err := validateUsername(req.Username); err != nil {
-		return err
-	}
-	if err := validatePassword(req.Password); err != nil {
+	// CHECK IF ACCOUNT ID EXISTS
+	if err := validateAccountId(s.repo.CheckAccountIdExists(accountId)); err != nil {
 		return err
 	}
 
-	equal, err := s.repo.CheckUsernameIsEqualToOld(accountId, req.Username)
-	if err != nil {
+	// VALIDATE ACCOUNT INFO
+	if err := validateAccountRequest(req); err != nil {
 		return err
 	}
 
-	if !equal {
-		exists, err := s.repo.CheckUsernameExists(req.Username)
-		if err != nil {
-			return err
-		}
-
-		if exists {
-			return custom_errors.ErrUsernameExists
-		}
+	// CHECK IF USERNAME IS EQUAL TO OLD
+	// IN CASE IT IS NOT - CHECK IF USERNAME IS UNIQUE
+	equal, err1 := s.repo.CheckUsernameIsEqualToOld(accountId, req.Username)
+	exists, err2 := s.repo.CheckUsernameExists(req.Username)
+	if err := validateUpdatedUsername(equal, err1, exists, err2); err != nil {
+		return err
 	}
 
+	// HASH PASSWORD
 	req.Password = generatePasswordHash(req.Password)
 
 	return s.repo.UpdateAccount(accountId, req)
