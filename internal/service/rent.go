@@ -18,20 +18,12 @@ func (s *Service) GetAvailableTransport(latitude float64, longitude float64, rad
 }
 
 func (s *Service) GetRent(userId int, rentId int) (models.RentResponse, error) {
-	exists, err := s.repo.CheckAccountIdExists(userId)
-	if err != nil {
+	if err := validateAccountId(s.repo.CheckAccountIdExists(userId)); err != nil {
 		return models.RentResponse{}, err
-	}
-	if !exists {
-		return models.RentResponse{}, custom_errors.ErrIdNotFound
 	}
 
-	exists, err = s.repo.CheckRentIdExists(rentId)
-	if err != nil {
+	if err := validateRentId(s.repo.CheckRentIdExists(rentId)); err != nil {
 		return models.RentResponse{}, err
-	}
-	if !exists {
-		return models.RentResponse{}, custom_errors.ErrIdNotFound
 	}
 
 	rent, err := s.repo.GetRent(rentId)
@@ -40,131 +32,83 @@ func (s *Service) GetRent(userId int, rentId int) (models.RentResponse, error) {
 	}
 
 	ownerId, err := s.repo.CheckOwnerId(rent.TransportId)
-	if err != nil {
+	if err := validateRentAccess(userId, ownerId, rent.UserId, err); err != nil {
 		return models.RentResponse{}, err
-	}
-	if userId != ownerId && userId != rent.UserId {
-		return models.RentResponse{}, custom_errors.ErrAccessDenied
 	}
 
 	return rent, nil
 }
 
 func (s *Service) GetTransportHistory(userId int, transportId int) ([]models.RentResponse, error) {
-	exists, err := s.repo.CheckAccountIdExists(userId)
-	if err != nil {
+	if err := validateAccountId(s.repo.CheckAccountIdExists(userId)); err != nil {
 		return []models.RentResponse{}, err
-	}
-	if !exists {
-		return []models.RentResponse{}, custom_errors.ErrIdNotFound
 	}
 
-	exists, err = s.repo.CheckTransportIdExists(transportId)
-	if err != nil {
+	if err := validateTransportId(s.repo.CheckTransportIdExists(transportId)); err != nil {
 		return []models.RentResponse{}, err
-	}
-	if !exists {
-		return []models.RentResponse{}, custom_errors.ErrIdNotFound
 	}
 
 	ownerId, err := s.repo.CheckOwnerId(transportId)
-	if err != nil {
+	if err := validateRentOwner(userId, ownerId, err); err != nil {
 		return []models.RentResponse{}, err
-	}
-	if userId != ownerId {
-		return []models.RentResponse{}, custom_errors.ErrAccessDenied
 	}
 
 	return s.repo.GetTransportHistory(transportId)
 }
 
 func (s *Service) GetUserHistory(accountId int) ([]models.RentResponse, error) {
-	exists, err := s.repo.CheckAccountIdExists(accountId)
-	if err != nil {
+	if err := validateAccountId(s.repo.CheckAccountIdExists(accountId)); err != nil {
 		return []models.RentResponse{}, err
-	}
-	if !exists {
-		return []models.RentResponse{}, custom_errors.ErrIdNotFound
 	}
 
 	return s.repo.GetUserHistory(accountId)
 }
 
 func (s *Service) StartRent(userId int, transportId int, rentType string) (int, error) {
-	exists, err := s.repo.CheckAccountIdExists(userId)
-	if err != nil {
+	if err := validateAccountId(s.repo.CheckAccountIdExists(userId)); err != nil {
 		return -1, err
-	}
-	if !exists {
-		return -1, custom_errors.ErrIdNotFound
 	}
 
 	ownerId, err := s.repo.CheckOwnerId(transportId)
-	if err != nil {
+	if err := validateTransportOwner1(userId, ownerId, err); err != nil {
 		return -1, err
 	}
-	if ownerId == userId {
-		return -1, custom_errors.ErrCanNotRent
-	}
 
-	exists, err = s.repo.CheckTransportIdExists(transportId)
-	if err != nil {
+	if err := validateTransportId(s.repo.CheckTransportIdExists(transportId)); err != nil {
 		return -1, err
 	}
-	if !exists {
-		return -1, custom_errors.ErrIdNotFound
-	}
 
-	is_available, err := s.repo.CheckTransportIsAvailable(transportId)
-	if err != nil {
+	if err := validateTransportIsAvailable(s.repo.CheckTransportIsAvailable(transportId)); err != nil {
 		return -1, err
 	}
-	if !is_available {
-		return -1, custom_errors.ErrTransportNotAvailable
-	}
 
-	if rentType != "Minutes" && rentType != "Days" {
-		return -1, custom_errors.ErrInvalidParams
+	if err := validateRentType(rentType); err != nil {
+		return -1, err
 	}
 
 	return s.repo.StartRent(userId, transportId, rentType)
 }
 
 func (s *Service) StopRent(userId int, rentId int, latitude float64, longitude float64) error {
-	exists, err := s.repo.CheckAccountIdExists(userId)
-	if err != nil {
+	if err := validateAccountId(s.repo.CheckAccountIdExists(userId)); err != nil {
 		return err
-	}
-	if !exists {
-		return custom_errors.ErrIdNotFound
 	}
 
 	ownerId, err := s.repo.CheckRentOwnerId(rentId)
-	if err != nil {
+	if err := validateRentOwner(userId, ownerId, err); err != nil {
 		return err
-	}
-	if ownerId != userId {
-		return custom_errors.ErrAccessDenied
 	}
 
 	if latitude < 0 || longitude < 0 {
 		return custom_errors.ErrInvalidParams
 	}
 
-	exists, err = s.repo.CheckRentIdExists(rentId)
-	if err != nil {
+	if err := validateRentId(s.repo.CheckRentIdExists(rentId)); err != nil {
 		return err
-	}
-	if !exists {
-		return custom_errors.ErrIdNotFound
 	}
 
-	is_active, err := s.repo.CheckRentIsActive(rentId)
-	if err != nil {
+	if err := validateRentIsActive(s.repo.CheckRentIsActive(rentId)); err != nil {
 		return err
-	}
-	if !is_active {
-		return custom_errors.ErrAlreadyStopped
 	}
 
 	return s.repo.StopRent(rentId, latitude, longitude)

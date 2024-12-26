@@ -16,6 +16,8 @@ var (
 	ErrInvalidTransportProperties = errors.New("invalid transport properties")
 	ErrCanNotDeleteTransport      = errors.New("can not delete transport with active rents")
 
+	ErrRentIdNotFound = errors.New("rent id not found")
+
 	ErrInvalidPaginationParams   = errors.New("invalid pagination params")
 	ErrAccessDenied              = errors.New("access denied")
 	ErrInvalidUsernameOrPassword = errors.New("invalid username or password")

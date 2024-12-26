@@ -56,7 +56,7 @@ func (r *PostgresRepository) CheckAccountIdHasActiveRents(accountId int) (bool, 
 		return false, err
 	}
 
-	return true, nil
+	return has, nil
 }
 
 func (r *PostgresRepository) CheckOwnerId(transportId int) (int, error) {
@@ -89,7 +89,7 @@ func (r *PostgresRepository) CheckTransportIdHasActiveRents(transportId int) (bo
 		return false, err
 	}
 
-	return true, nil
+	return has, nil
 }
 
 func (r *PostgresRepository) CheckRentIdExists(rentId int) (bool, error) {

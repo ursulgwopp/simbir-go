@@ -138,6 +138,17 @@ func validateTransportOwner(userId int, ownerId int, err error) error {
 	return nil
 }
 
+func validateTransportOwner1(userId int, ownerId int, err error) error {
+	if err != nil {
+		return err
+	}
+	if userId == ownerId {
+		return custom_errors.ErrCanNotRent
+	}
+
+	return nil
+}
+
 func validateTransportType(transportType string) error {
 	if transportType != "Car" && transportType != "Bike" && transportType != "Scooter" && transportType != "All" {
 		return custom_errors.ErrInvalidTransportType
@@ -177,6 +188,73 @@ func validateTransportDeletion(has bool, err error) error {
 
 	if has {
 		return custom_errors.ErrCanNotDeleteTransport
+	}
+
+	return nil
+}
+
+func validateTransportIsAvailable(is_available bool, err error) error {
+	if err != nil {
+		return err
+	}
+	if !is_available {
+		return custom_errors.ErrTransportNotAvailable
+	}
+
+	return nil
+}
+
+func validateRentId(exists bool, err error) error {
+	if err != nil {
+		return err
+	}
+
+	if !exists {
+		return custom_errors.ErrTransportIdNotFound
+	}
+
+	return nil
+}
+
+func validateRentAccess(userId int, transportOwnerId int, rentOwnerId int, err error) error {
+	if err != nil {
+		return err
+	}
+
+	if userId != transportOwnerId && userId != rentOwnerId {
+		return custom_errors.ErrAccessDenied
+	}
+
+	return nil
+}
+
+func validateRentOwner(userId int, ownerId int, err error) error {
+	if err != nil {
+		return err
+	}
+
+	if userId != ownerId {
+		return custom_errors.ErrAccessDenied
+	}
+
+	return nil
+}
+
+func validateRentType(rentType string) error {
+	if rentType != "Minutes" && rentType != "Days" {
+		return custom_errors.ErrInvalidParams
+	}
+
+	return nil
+}
+
+func validateRentIsActive(is_active bool, err error) error {
+	if err != nil {
+		return err
+	}
+
+	if !is_active {
+		return custom_errors.ErrAlreadyStopped
 	}
 
 	return nil

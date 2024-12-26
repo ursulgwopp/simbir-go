@@ -3,8 +3,8 @@ package models
 import "github.com/dgrijalva/jwt-go"
 
 type AccountRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
 
 type AccountResponse struct {

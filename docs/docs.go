@@ -1529,6 +1529,10 @@ const docTemplate = `{
     "definitions": {
         "models.AccountRequest": {
             "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
             "properties": {
                 "password": {
                     "type": "string"

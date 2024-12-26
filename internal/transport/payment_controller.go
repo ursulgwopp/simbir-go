@@ -42,8 +42,9 @@ func (t *Transport) hesoyam(c *gin.Context) {
 	}
 
 	if err := t.service.Hesoyam(accountId, userId, isAdmin); err != nil {
-		if errors.Is(err, custom_errors.ErrAccessDenied) {
-			models.NewErrorResponse(c, http.StatusForbidden, err.Error())
+		if errors.Is(err, custom_errors.ErrAccessDenied) ||
+			errors.Is(err, custom_errors.ErrAccountIdNotFound) {
+			models.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 			return
 		}
 
