@@ -2,10 +2,12 @@ package main
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
@@ -63,6 +65,8 @@ func main() {
 		}
 	}()
 
+	go startWithdrawingProcess(repo, db)
+
 	logrus.Print("App Started")
 
 	quit := make(chan os.Signal, 1)
@@ -80,6 +84,78 @@ func main() {
 	}
 }
 
-func withdrawFromBalance(db *sqlx.DB) error {
-	tx, err := db.Begin()
+func startWithdrawingProcess(repo service.Repository, db *sqlx.DB) {
+	// Calculate the duration until the next minute
+	now := time.Now()
+	nextMinute := now.Truncate(time.Minute).Add(time.Minute)
+	durationUntilNextMinute := nextMinute.Sub(now)
+
+	// Wait until the next minute
+	time.Sleep(durationUntilNextMinute)
+
+	// Now set up a ticker to withdraw every minute
+	ticker := time.NewTicker(time.Minute)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ticker.C:
+			err := withdrawFromBalance(repo, db)
+			if err != nil {
+				log.Panic(err)
+			} else {
+				log.Println("successfully")
+			}
+		}
+	}
+}
+
+type WithdrawInfo struct {
+	RentId      int
+	UserId      int
+	PriceOfUnit int
+}
+
+func withdrawFromBalance(repo service.Repository, db *sqlx.DB) error {
+	var users []WithdrawInfo
+	query := `SELECT id, user_id, price_of_unit FROM rents WHERE is_active = TRUE AND price_type = 'Minutes'`
+	rows, err := db.Query(query)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var user WithdrawInfo
+		if err := rows.Scan(&user.RentId, &user.UserId, &user.PriceOfUnit); err != nil {
+			return err
+		}
+
+		users = append(users, user)
+	}
+
+	if err := rows.Err(); err != nil {
+		return err
+	}
+
+	for _, user := range users {
+		var balance int
+		query := `SELECT balance FROM accounts WHERE id = $1`
+		if err := db.QueryRow(query, user.UserId).Scan(&balance); err != nil {
+			return err
+		}
+
+		if balance < user.PriceOfUnit {
+			repo.StopRent(user.RentId, 61, 31)
+			continue
+		}
+
+		query = `UPDATE accounts SET balance = balance - $1 WHERE id = $2`
+		_, err := db.Exec(query, user.PriceOfUnit, user.UserId)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

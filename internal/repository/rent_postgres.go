@@ -181,11 +181,11 @@ func (r *PostgresRepository) StopRent(rentId int, latitude float64, longitude fl
 	}
 
 	// withdraw money
-	query = `UPDATE accounts SET balance = balance - $1 WHERE id = $2`
-	_, err = r.db.ExecContext(ctx, query, rent.FinalPrice, rent.UserId)
-	if err != nil {
-		return err
-	}
+	// query = `UPDATE accounts SET balance = balance - $1 WHERE id = $2`
+	// _, err = r.db.ExecContext(ctx, query, rent.FinalPrice, rent.UserId)
+	// if err != nil {
+	// 	return err
+	// }
 
 	// update canberented for car
 	query = `UPDATE transports SET can_be_rented = true WHERE id = $1`
