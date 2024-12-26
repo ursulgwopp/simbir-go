@@ -5,7 +5,7 @@ import (
 )
 
 func (s *Service) GetTransport(transportId int) (models.TransportResponse, error) {
-	if err := validateTransportId(s.repo.CheckTransportIdExists(transportId)); err != nil {
+	if err := validateTransportId(s, transportId); err != nil {
 		return models.TransportResponse{}, err
 	}
 
@@ -13,7 +13,7 @@ func (s *Service) GetTransport(transportId int) (models.TransportResponse, error
 }
 
 func (s *Service) CreateTransport(ownerId int, req models.TransportRequest) (int, error) {
-	if err := validateAccountId(s.repo.CheckAccountIdExists(ownerId)); err != nil {
+	if err := validateAccountId(s, ownerId); err != nil {
 		return -1, err
 	}
 
@@ -29,16 +29,15 @@ func (s *Service) CreateTransport(ownerId int, req models.TransportRequest) (int
 }
 
 func (s *Service) UpdateTransport(userId int, transportId int, req models.TransportRequest) error {
-	if err := validateAccountId(s.repo.CheckAccountIdExists(userId)); err != nil {
+	if err := validateAccountId(s, userId); err != nil {
 		return err
 	}
 
-	if err := validateTransportId(s.repo.CheckTransportIdExists(transportId)); err != nil {
+	if err := validateTransportId(s, transportId); err != nil {
 		return err
 	}
 
-	ownerId, err := s.repo.CheckOwnerId(transportId)
-	if err := validateTransportOwner(userId, ownerId, err); err != nil {
+	if err := validateTransportOwner(s, userId, transportId); err != nil {
 		return err
 	}
 
@@ -50,20 +49,19 @@ func (s *Service) UpdateTransport(userId int, transportId int, req models.Transp
 }
 
 func (s *Service) DeleteTransport(userId int, transportId int) error {
-	if err := validateAccountId(s.repo.CheckAccountIdExists(userId)); err != nil {
+	if err := validateAccountId(s, userId); err != nil {
 		return err
 	}
 
-	if err := validateTransportId(s.repo.CheckTransportIdExists(transportId)); err != nil {
+	if err := validateTransportId(s, transportId); err != nil {
 		return err
 	}
 
-	ownerId, err := s.repo.CheckOwnerId(transportId)
-	if err := validateTransportOwner(userId, ownerId, err); err != nil {
+	if err := validateTransportOwner(s, userId, transportId); err != nil {
 		return err
 	}
 
-	if err := validateTransportDeletion(s.repo.CheckTransportIdHasActiveRents(transportId)); err != nil {
+	if err := validateTransportDeletion(s, transportId); err != nil {
 		return err
 	}
 

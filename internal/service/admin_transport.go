@@ -5,7 +5,7 @@ import (
 )
 
 func (s *Service) AdminCreateTransport(req models.AdminTransportRequest) (int, error) {
-	if err := validateAccountId(s.repo.CheckAccountIdExists(req.OwnerId)); err != nil {
+	if err := validateAccountId(s, req.OwnerId); err != nil {
 		return -1, err
 	}
 
@@ -21,11 +21,11 @@ func (s *Service) AdminCreateTransport(req models.AdminTransportRequest) (int, e
 }
 
 func (s *Service) AdminDeleteTransport(transportId int) error {
-	if err := validateTransportId(s.repo.CheckTransportIdExists(transportId)); err != nil {
+	if err := validateTransportId(s, transportId); err != nil {
 		return err
 	}
 
-	if err := validateTransportDeletion(s.repo.CheckTransportIdHasActiveRents(transportId)); err != nil {
+	if err := validateTransportDeletion(s, transportId); err != nil {
 		return err
 	}
 
@@ -33,12 +33,13 @@ func (s *Service) AdminDeleteTransport(transportId int) error {
 }
 
 func (s *Service) AdminGetTransport(transportId int) (models.AdminTransportResponse, error) {
-	if err := validateTransportId(s.repo.CheckTransportIdExists(transportId)); err != nil {
+	if err := validateTransportId(s, transportId); err != nil {
 		return models.AdminTransportResponse{}, err
 	}
 
 	return s.repo.AdminGetTransport(transportId)
 }
+
 func (s *Service) AdminListTransports(from int, count int, transportType string) ([]models.AdminTransportResponse, error) {
 	if err := validatePagination(from, count); err != nil {
 		return []models.AdminTransportResponse{}, err
@@ -52,7 +53,7 @@ func (s *Service) AdminListTransports(from int, count int, transportType string)
 }
 
 func (s *Service) AdminUpdateTransport(transportId int, req models.AdminTransportRequest) error {
-	if err := validateTransportId(s.repo.CheckTransportIdExists(transportId)); err != nil {
+	if err := validateTransportId(s, transportId); err != nil {
 		return err
 	}
 

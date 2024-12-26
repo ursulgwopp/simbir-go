@@ -25,7 +25,11 @@ func validatePagination(from int, count int) error {
 	return nil
 }
 
-func validateAccountId(exists bool, err error) error {
+// ACCOUNT VALIDATIONS
+
+func validateAccountId(s *Service, accountId int) error {
+	exists, err := s.repo.CheckAccountIdExists(accountId)
+
 	if err != nil {
 		return err
 	}
@@ -73,7 +77,9 @@ func validateAdminAccountRequest(req models.AdminAccountRequest) error {
 	return nil
 }
 
-func validateUsernameUniqueness(exists bool, err error) error {
+func validateUsernameUniqueness(s *Service, username string) error {
+	exists, err := s.repo.CheckUsernameExists(username)
+
 	if err != nil {
 		return err
 	}
@@ -85,14 +91,16 @@ func validateUsernameUniqueness(exists bool, err error) error {
 	return nil
 }
 
-func validateUpdatedUsernameUniqueness(equal bool, err1 error, exists bool, err2 error) error {
-	if err1 != nil {
-		return err1
+func validateUpdatedUsernameUniqueness(s *Service, accountId int, username string) error {
+	equal, err := s.repo.CheckUsernameIsEqualToOld(accountId, username)
+	if err != nil {
+		return err
 	}
 
 	if !equal {
-		if err2 != nil {
-			return err2
+		exists, err := s.repo.CheckUsernameExists(username)
+		if err != nil {
+			return err
 		}
 
 		if exists {
@@ -103,7 +111,9 @@ func validateUpdatedUsernameUniqueness(equal bool, err1 error, exists bool, err2
 	return nil
 }
 
-func validateAccountDeletion(has bool, err error) error {
+func validateAccountDeletion(s *Service, accountId int) error {
+	has, err := s.repo.CheckAccountIdHasActiveRents(accountId)
+
 	if err != nil {
 		return err
 	}
@@ -115,7 +125,10 @@ func validateAccountDeletion(has bool, err error) error {
 	return nil
 }
 
-func validateTransportId(exists bool, err error) error {
+// TRANSPORT VALIDATIONS
+
+func validateTransportId(s *Service, transportId int) error {
+	exists, err := s.repo.CheckTransportIdExists(transportId)
 	if err != nil {
 		return err
 	}
@@ -127,23 +140,14 @@ func validateTransportId(exists bool, err error) error {
 	return nil
 }
 
-func validateTransportOwner(userId int, ownerId int, err error) error {
+func validateTransportOwner(s *Service, userId int, transportId int) error {
+	ownerId, err := s.repo.CheckOwnerId(transportId)
 	if err != nil {
 		return err
 	}
+
 	if userId != ownerId {
 		return custom_errors.ErrAccessDenied
-	}
-
-	return nil
-}
-
-func validateTransportOwner1(userId int, ownerId int, err error) error {
-	if err != nil {
-		return err
-	}
-	if userId == ownerId {
-		return custom_errors.ErrCanNotRent
 	}
 
 	return nil
@@ -181,7 +185,8 @@ func validateAdminTransportRequest(req models.AdminTransportRequest) error {
 	return nil
 }
 
-func validateTransportDeletion(has bool, err error) error {
+func validateTransportDeletion(s *Service, transportId int) error {
+	has, err := s.repo.CheckTransportIdHasActiveRents(transportId)
 	if err != nil {
 		return err
 	}
@@ -193,10 +198,12 @@ func validateTransportDeletion(has bool, err error) error {
 	return nil
 }
 
-func validateTransportIsAvailable(is_available bool, err error) error {
+func validateTransportIsAvailable(s *Service, transportId int) error {
+	is_available, err := s.repo.CheckTransportIsAvailable(transportId)
 	if err != nil {
 		return err
 	}
+
 	if !is_available {
 		return custom_errors.ErrTransportNotAvailable
 	}
@@ -204,7 +211,10 @@ func validateTransportIsAvailable(is_available bool, err error) error {
 	return nil
 }
 
-func validateRentId(exists bool, err error) error {
+// RENT VALIDATIONS
+
+func validateRentId(s *Service, rentId int) error {
+	exists, err := s.repo.CheckRentIdExists(rentId)
 	if err != nil {
 		return err
 	}
@@ -216,7 +226,8 @@ func validateRentId(exists bool, err error) error {
 	return nil
 }
 
-func validateRentAccess(userId int, transportOwnerId int, rentOwnerId int, err error) error {
+func validateRentAccess(s *Service, userId int, transportId int, rentOwnerId int) error {
+	transportOwnerId, err := s.repo.CheckOwnerId(transportId)
 	if err != nil {
 		return err
 	}
@@ -228,7 +239,8 @@ func validateRentAccess(userId int, transportOwnerId int, rentOwnerId int, err e
 	return nil
 }
 
-func validateRentOwner(userId int, ownerId int, err error) error {
+func validateRentOwner(s *Service, userId int, rentId int) error {
+	ownerId, err := s.repo.CheckRentOwnerId(rentId)
 	if err != nil {
 		return err
 	}
@@ -248,7 +260,8 @@ func validateRentType(rentType string) error {
 	return nil
 }
 
-func validateRentIsActive(is_active bool, err error) error {
+func validateRentIsActive(s *Service, rentId int) error {
+	is_active, err := s.repo.CheckRentIsActive(rentId)
 	if err != nil {
 		return err
 	}

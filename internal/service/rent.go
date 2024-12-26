@@ -18,11 +18,11 @@ func (s *Service) GetAvailableTransport(latitude float64, longitude float64, rad
 }
 
 func (s *Service) GetRent(userId int, rentId int) (models.RentResponse, error) {
-	if err := validateAccountId(s.repo.CheckAccountIdExists(userId)); err != nil {
+	if err := validateAccountId(s, userId); err != nil {
 		return models.RentResponse{}, err
 	}
 
-	if err := validateRentId(s.repo.CheckRentIdExists(rentId)); err != nil {
+	if err := validateRentId(s, rentId); err != nil {
 		return models.RentResponse{}, err
 	}
 
@@ -31,8 +31,7 @@ func (s *Service) GetRent(userId int, rentId int) (models.RentResponse, error) {
 		return models.RentResponse{}, err
 	}
 
-	ownerId, err := s.repo.CheckOwnerId(rent.TransportId)
-	if err := validateRentAccess(userId, ownerId, rent.UserId, err); err != nil {
+	if err := validateRentAccess(s, userId, rent.TransportId, rent.UserId); err != nil {
 		return models.RentResponse{}, err
 	}
 
@@ -40,16 +39,15 @@ func (s *Service) GetRent(userId int, rentId int) (models.RentResponse, error) {
 }
 
 func (s *Service) GetTransportHistory(userId int, transportId int) ([]models.RentResponse, error) {
-	if err := validateAccountId(s.repo.CheckAccountIdExists(userId)); err != nil {
+	if err := validateAccountId(s, userId); err != nil {
 		return []models.RentResponse{}, err
 	}
 
-	if err := validateTransportId(s.repo.CheckTransportIdExists(transportId)); err != nil {
+	if err := validateTransportId(s, transportId); err != nil {
 		return []models.RentResponse{}, err
 	}
 
-	ownerId, err := s.repo.CheckOwnerId(transportId)
-	if err := validateRentOwner(userId, ownerId, err); err != nil {
+	if err := validateTransportOwner(s, userId, transportId); err != nil {
 		return []models.RentResponse{}, err
 	}
 
@@ -57,7 +55,7 @@ func (s *Service) GetTransportHistory(userId int, transportId int) ([]models.Ren
 }
 
 func (s *Service) GetUserHistory(accountId int) ([]models.RentResponse, error) {
-	if err := validateAccountId(s.repo.CheckAccountIdExists(accountId)); err != nil {
+	if err := validateAccountId(s, accountId); err != nil {
 		return []models.RentResponse{}, err
 	}
 
@@ -65,20 +63,19 @@ func (s *Service) GetUserHistory(accountId int) ([]models.RentResponse, error) {
 }
 
 func (s *Service) StartRent(userId int, transportId int, rentType string) (int, error) {
-	if err := validateAccountId(s.repo.CheckAccountIdExists(userId)); err != nil {
+	if err := validateAccountId(s, userId); err != nil {
 		return -1, err
 	}
 
-	ownerId, err := s.repo.CheckOwnerId(transportId)
-	if err := validateTransportOwner1(userId, ownerId, err); err != nil {
+	if err := validateTransportOwner(s, userId, transportId); err == nil {
+		return -1, custom_errors.ErrCanNotRent
+	}
+
+	if err := validateTransportId(s, transportId); err != nil {
 		return -1, err
 	}
 
-	if err := validateTransportId(s.repo.CheckTransportIdExists(transportId)); err != nil {
-		return -1, err
-	}
-
-	if err := validateTransportIsAvailable(s.repo.CheckTransportIsAvailable(transportId)); err != nil {
+	if err := validateTransportIsAvailable(s, transportId); err != nil {
 		return -1, err
 	}
 
@@ -90,12 +87,11 @@ func (s *Service) StartRent(userId int, transportId int, rentType string) (int, 
 }
 
 func (s *Service) StopRent(userId int, rentId int, latitude float64, longitude float64) error {
-	if err := validateAccountId(s.repo.CheckAccountIdExists(userId)); err != nil {
+	if err := validateAccountId(s, userId); err != nil {
 		return err
 	}
 
-	ownerId, err := s.repo.CheckRentOwnerId(rentId)
-	if err := validateRentOwner(userId, ownerId, err); err != nil {
+	if err := validateRentOwner(s, userId, rentId); err != nil {
 		return err
 	}
 
@@ -103,11 +99,11 @@ func (s *Service) StopRent(userId int, rentId int, latitude float64, longitude f
 		return custom_errors.ErrInvalidParams
 	}
 
-	if err := validateRentId(s.repo.CheckRentIdExists(rentId)); err != nil {
+	if err := validateRentId(s, rentId); err != nil {
 		return err
 	}
 
-	if err := validateRentIsActive(s.repo.CheckRentIsActive(rentId)); err != nil {
+	if err := validateRentIsActive(s, rentId); err != nil {
 		return err
 	}
 

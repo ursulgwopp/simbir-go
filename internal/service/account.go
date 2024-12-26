@@ -14,7 +14,7 @@ func (s *Service) SignUp(req models.AccountRequest) (int, error) {
 		return -1, err
 	}
 
-	if err := validateUsernameUniqueness(s.repo.CheckUsernameExists(req.Username)); err != nil {
+	if err := validateUsernameUniqueness(s, req.Username); err != nil {
 		return -1, err
 	}
 
@@ -51,7 +51,7 @@ func (s *Service) SignOut(token string) error {
 }
 
 func (s *Service) GetAccount(accountId int) (models.AccountResponse, error) {
-	if err := validateAccountId(s.repo.CheckAccountIdExists(accountId)); err != nil {
+	if err := validateAccountId(s, accountId); err != nil {
 		return models.AccountResponse{}, err
 	}
 
@@ -59,7 +59,7 @@ func (s *Service) GetAccount(accountId int) (models.AccountResponse, error) {
 }
 
 func (s *Service) UpdateAccount(accountId int, req models.AccountRequest) error {
-	if err := validateAccountId(s.repo.CheckAccountIdExists(accountId)); err != nil {
+	if err := validateAccountId(s, accountId); err != nil {
 		return err
 	}
 
@@ -67,9 +67,7 @@ func (s *Service) UpdateAccount(accountId int, req models.AccountRequest) error 
 		return err
 	}
 
-	equal, err1 := s.repo.CheckUsernameIsEqualToOld(accountId, req.Username)
-	exists, err2 := s.repo.CheckUsernameExists(req.Username)
-	if err := validateUpdatedUsernameUniqueness(equal, err1, exists, err2); err != nil {
+	if err := validateUpdatedUsernameUniqueness(s, accountId, req.Username); err != nil {
 		return err
 	}
 

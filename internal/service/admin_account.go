@@ -14,7 +14,7 @@ func (s *Service) AdminListAccounts(from int, count int) ([]models.AdminAccountR
 }
 
 func (s *Service) AdminGetAccount(accountId int) (models.AdminAccountResponse, error) {
-	if err := validateAccountId(s.repo.CheckAccountIdExists(accountId)); err != nil {
+	if err := validateAccountId(s, accountId); err != nil {
 		return models.AdminAccountResponse{}, err
 	}
 
@@ -26,7 +26,7 @@ func (s *Service) AdminCreateAccount(req models.AdminAccountRequest) (int, error
 		return -1, err
 	}
 
-	if err := validateUsernameUniqueness(s.repo.CheckUsernameExists(req.Username)); err != nil {
+	if err := validateUsernameUniqueness(s, req.Username); err != nil {
 		return -1, err
 	}
 
@@ -36,7 +36,7 @@ func (s *Service) AdminCreateAccount(req models.AdminAccountRequest) (int, error
 }
 
 func (s *Service) AdminUpdateAccount(accountId int, req models.AdminAccountRequest) error {
-	if err := validateAccountId(s.repo.CheckAccountIdExists(accountId)); err != nil {
+	if err := validateAccountId(s, accountId); err != nil {
 		return err
 	}
 
@@ -44,9 +44,7 @@ func (s *Service) AdminUpdateAccount(accountId int, req models.AdminAccountReque
 		return err
 	}
 
-	equal, err1 := s.repo.CheckUsernameIsEqualToOld(accountId, req.Username)
-	exists, err2 := s.repo.CheckUsernameExists(req.Username)
-	if err := validateUpdatedUsernameUniqueness(equal, err1, exists, err2); err != nil {
+	if err := validateUpdatedUsernameUniqueness(s, accountId, req.Username); err != nil {
 		return err
 	}
 
@@ -56,11 +54,11 @@ func (s *Service) AdminUpdateAccount(accountId int, req models.AdminAccountReque
 }
 
 func (s *Service) AdminDeleteAccount(accountId int) error {
-	if err := validateAccountId(s.repo.CheckAccountIdExists(accountId)); err != nil {
+	if err := validateAccountId(s, accountId); err != nil {
 		return err
 	}
 
-	if err := validateAccountDeletion(s.repo.CheckAccountIdHasActiveRents(accountId)); err != nil {
+	if err := validateAccountDeletion(s, accountId); err != nil {
 		return err
 	}
 
