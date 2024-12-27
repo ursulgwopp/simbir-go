@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"math"
 	"time"
 
@@ -130,14 +131,40 @@ func (r *PostgresRepository) StartRent(userId int, transportId int, rentType str
 		return -1, err
 	}
 
+	var balance float64
+	query = `SELECT balance FROM accounts WHERE id = $1`
+	if err := r.db.QueryRowContext(ctx, query, userId).Scan(&balance); err != nil {
+		return -1, err
+	}
+
 	var id int
 	query = `INSERT INTO rents (transport_id, user_id, time_start, price_of_unit, price_type) VALUES ($1, $2, $3, $4, $5) RETURNING id`
 	if rentType == "Days" {
+		if balance < dayPrice {
+			return -1, errors.New("no money")
+		}
+
 		if err := r.db.QueryRowContext(ctx, query, transportId, userId, time.Now(), dayPrice, rentType).Scan(&id); err != nil {
 			return -1, err
 		}
+
+		query = `UPDATE accounts SET balance = balance - $1 WHERE id = 2`
+		_, err := r.db.ExecContext(ctx, query, dayPrice, userId)
+		if err != nil {
+			return -1, err
+		}
 	} else {
+		if balance < minutePrice {
+			return -1, errors.New("no money")
+		}
+
 		if err := r.db.QueryRowContext(ctx, query, transportId, userId, time.Now(), minutePrice, rentType).Scan(&id); err != nil {
+			return -1, err
+		}
+
+		query = `UPDATE accounts SET balance = balance - $1 WHERE id = 2`
+		_, err := r.db.ExecContext(ctx, query, minutePrice, userId)
+		if err != nil {
 			return -1, err
 		}
 	}
