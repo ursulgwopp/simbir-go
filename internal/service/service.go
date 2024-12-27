@@ -19,6 +19,8 @@ type Repository interface {
 	AdminDeleteAccount(accountId int) error
 
 	Hesoyam(accountId int) error
+	MinutelyPayment() error
+	DailyPayment() error
 
 	CreateTransport(ownerId int, req models.TransportRequest) (int, error)
 	GetTransport(transportId int) (models.TransportResponse, error)

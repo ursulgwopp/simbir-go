@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -9,7 +10,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
@@ -65,7 +65,8 @@ func main() {
 		}
 	}()
 
-	go startWithdrawingProcess(repo, db)
+	go startMinutelyWithdrawingProcess(repo)
+	go startDailyWithdrawingProcess(repo)
 
 	logrus.Print("App Started")
 
@@ -84,78 +85,35 @@ func main() {
 	}
 }
 
-func startWithdrawingProcess(repo service.Repository, db *sqlx.DB) {
-	// Calculate the duration until the next minute
-	now := time.Now()
-	nextMinute := now.Truncate(time.Minute).Add(time.Minute)
-	durationUntilNextMinute := nextMinute.Sub(now)
-
-	// Wait until the next minute
-	time.Sleep(durationUntilNextMinute)
-
-	// Now set up a ticker to withdraw every minute
-	ticker := time.NewTicker(time.Minute)
-	defer ticker.Stop()
-
+func startMinutelyWithdrawingProcess(repo service.Repository) {
 	for {
-		select {
-		case <-ticker.C:
-			err := withdrawFromBalance(repo, db)
-			if err != nil {
-				log.Panic(err)
-			} else {
-				log.Println("successfully")
-			}
+		now := time.Now()
+		nextMinute := now.Truncate(time.Minute).Add(time.Minute) // Get the start of the next minute
+
+		// Wait until the next minute
+		fmt.Printf("Waiting until %s...\n", nextMinute.Format("15:04:05"))
+		time.Sleep(time.Until(nextMinute)) // Sleep until the next minute
+
+		// Execute your withdrawal logic here
+		fmt.Println("Withdrawing at:", time.Now())
+		if err := repo.MinutelyPayment(); err != nil {
+			log.Panic(err)
 		}
 	}
 }
 
-type WithdrawInfo struct {
-	RentId      int
-	UserId      int
-	PriceOfUnit int
-}
+func startDailyWithdrawingProcess(repo service.Repository) {
+	for {
+		now := time.Now()
+		nextMidnight := now.Truncate(24 * time.Hour).Add(21 * time.Hour)
 
-func withdrawFromBalance(repo service.Repository, db *sqlx.DB) error {
-	var users []WithdrawInfo
-	query := `SELECT id, user_id, price_of_unit FROM rents WHERE is_active = TRUE AND price_type = 'Minutes'`
-	rows, err := db.Query(query)
-	if err != nil {
-		return err
-	}
-	defer rows.Close()
+		fmt.Printf("Waiting until %s...\n", nextMidnight.Format("15:04:05"))
+		time.Sleep(time.Until(nextMidnight)) // Sleep until the next minute
 
-	for rows.Next() {
-		var user WithdrawInfo
-		if err := rows.Scan(&user.RentId, &user.UserId, &user.PriceOfUnit); err != nil {
-			return err
-		}
-
-		users = append(users, user)
-	}
-
-	if err := rows.Err(); err != nil {
-		return err
-	}
-
-	for _, user := range users {
-		var balance int
-		query := `SELECT balance FROM accounts WHERE id = $1`
-		if err := db.QueryRow(query, user.UserId).Scan(&balance); err != nil {
-			return err
-		}
-
-		if balance < user.PriceOfUnit {
-			repo.StopRent(user.RentId, 61, 31)
-			continue
-		}
-
-		query = `UPDATE accounts SET balance = balance - $1 WHERE id = $2`
-		_, err := db.Exec(query, user.PriceOfUnit, user.UserId)
-		if err != nil {
-			return err
+		// Execute your withdrawal logic here
+		fmt.Println("Withdrawing at:", time.Now())
+		if err := repo.DailyPayment(); err != nil {
+			log.Panic(err)
 		}
 	}
-
-	return nil
 }
