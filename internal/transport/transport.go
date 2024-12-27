@@ -44,6 +44,14 @@ type Service interface {
 	AdminUpdateTransport(transportId int, req models.AdminTransportRequest) error
 	AdminDeleteTransport(transportId int) error
 
+	AdminGetRent(rentId int) (models.RentResponse, error)
+	AdminGetUserHistory(userId int) ([]models.RentResponse, error)
+	AdminGetTransportHistory(transportId int) ([]models.RentResponse, error)
+	AdminStartRent(req models.RentRequest) (int, error)
+	AdminStopRent(rentId int, latitude float64, longitude float64) error
+	AdminUpdateRent(rentId int, req models.RentRequest) error
+	AdminDeleteRent(rentId int) error
+
 	CheckTokenIsValid(token string) (bool, error)
 	ParseToken(token string) (models.TokenInfo, error)
 }

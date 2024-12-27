@@ -21,12 +21,12 @@ func (r *PostgresRepository) AdminCreateAccount(req models.AdminAccountRequest) 
 }
 
 func (r *PostgresRepository) AdminListAccounts(from int, count int) ([]models.AdminAccountResponse, error) {
-	context, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
 	var accounts []models.AdminAccountResponse
 	query := `SELECT id, username, balance, is_admin FROM accounts ORDER BY id OFFSET $1 LIMIT $2`
-	rows, err := r.db.QueryContext(context, query, from, count)
+	rows, err := r.db.QueryContext(ctx, query, from, count)
 	if err != nil {
 		return []models.AdminAccountResponse{}, err
 	}

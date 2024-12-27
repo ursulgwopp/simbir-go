@@ -1,6 +1,9 @@
 package repository
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 func (r *PostgresRepository) Hesoyam(accountId int) error {
 	ctx, cancel := context.WithTimeout(context.Background(), operationTimeout)
@@ -19,9 +22,12 @@ type WithdrawInfo struct {
 }
 
 func (r *PostgresRepository) MinutelyPayment() error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
 	var users []WithdrawInfo
 	query := `SELECT id, user_id, price_of_unit FROM rents WHERE is_active = TRUE AND price_type = 'Minutes'`
-	rows, err := r.db.Query(query)
+	rows, err := r.db.QueryContext(ctx, query)
 	if err != nil {
 		return err
 	}
@@ -43,7 +49,7 @@ func (r *PostgresRepository) MinutelyPayment() error {
 	for _, user := range users {
 		var balance int
 		query := `SELECT balance FROM accounts WHERE id = $1`
-		if err := r.db.QueryRow(query, user.UserId).Scan(&balance); err != nil {
+		if err := r.db.QueryRowContext(ctx, query, user.UserId).Scan(&balance); err != nil {
 			return err
 		}
 
@@ -53,7 +59,7 @@ func (r *PostgresRepository) MinutelyPayment() error {
 		}
 
 		query = `UPDATE accounts SET balance = balance - $1 WHERE id = $2`
-		_, err := r.db.Exec(query, user.PriceOfUnit, user.UserId)
+		_, err := r.db.ExecContext(ctx, query, user.PriceOfUnit, user.UserId)
 		if err != nil {
 			return err
 		}
@@ -63,9 +69,12 @@ func (r *PostgresRepository) MinutelyPayment() error {
 }
 
 func (r *PostgresRepository) DailyPayment() error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
 	var users []WithdrawInfo
 	query := `SELECT id, user_id, price_of_unit FROM rents WHERE is_active = TRUE AND price_type = 'Days'`
-	rows, err := r.db.Query(query)
+	rows, err := r.db.QueryContext(ctx, query)
 	if err != nil {
 		return err
 	}
@@ -87,7 +96,7 @@ func (r *PostgresRepository) DailyPayment() error {
 	for _, user := range users {
 		var balance int
 		query := `SELECT balance FROM accounts WHERE id = $1`
-		if err := r.db.QueryRow(query, user.UserId).Scan(&balance); err != nil {
+		if err := r.db.QueryRowContext(ctx, query, user.UserId).Scan(&balance); err != nil {
 			return err
 		}
 
@@ -97,7 +106,7 @@ func (r *PostgresRepository) DailyPayment() error {
 		}
 
 		query = `UPDATE accounts SET balance = balance - $1 WHERE id = $2`
-		_, err := r.db.Exec(query, user.PriceOfUnit, user.UserId)
+		_, err := r.db.ExecContext(ctx, query, user.PriceOfUnit, user.UserId)
 		if err != nil {
 			return err
 		}
