@@ -162,7 +162,7 @@ func (r *PostgresRepository) StartRent(userId int, transportId int, rentType str
 			return -1, err
 		}
 
-		query = `UPDATE accounts SET balance = balance - $1 WHERE id = 2`
+		query = `UPDATE accounts SET balance = balance - $1 WHERE id = $2`
 		_, err := r.db.ExecContext(ctx, query, minutePrice, userId)
 		if err != nil {
 			return -1, err

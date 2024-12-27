@@ -57,6 +57,8 @@ The API will be available at http://localhost:2024/swagger/index.html.
 
 - Implement AdminRent Controller
 
+- Add TXs to repository layer
+
 ## Contributing
 
 Contributions are welcome! If you have suggestions for improvements or want to report a bug, please open an issue or submit a pull request.
